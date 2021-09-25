@@ -9,7 +9,6 @@ body{
     overflow-y: hidden;
     width: 25%;
     height: 100%;
-    /*background-color: powderblue ;*/
     background-image: url("../images/cat1.jpg");
     background-size: 25%;
     background-attachment: fixed;
@@ -17,7 +16,6 @@ body{
     float: left;
     box-shadow: 0 10px 8px 0 rgba(0,0,0,0.4), 0 6px 20px 0 rgba(0,0,0,0.2);
 }
-
 .right{
     top: 0;
     right: 0;
