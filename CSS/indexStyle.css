@@ -9,7 +9,6 @@ body{
     overflow-y: hidden;
     width: 25%;
     height: 100%;
-    /*background-color: powderblue ;*/
     background-image: url("../images/cat1.jpg");
     background-size: 25%;
     background-attachment: fixed;
