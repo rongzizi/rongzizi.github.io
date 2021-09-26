@@ -25,7 +25,6 @@ window.onload = function init(){
         0.0, 0.5,
         0.5, -0.5*/
     ];
-
     // Configure WebGL
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
@@ -45,11 +44,19 @@ window.onload = function init(){
     gl.enableVertexAttribArray( vPosition );
 
     render();
+    // main();
 }
 
 function render(){
     gl.clear( gl.COLOR_BUFFER_BIT );
-    //gl.drawArrays( gl.TRIANGLE_FAN, 0, 4 );
+    // gl.drawArrays( gl.TRIANGLE_FAN, 0, 4 );
     gl.drawArrays( gl.TRIANGLES, 0, 3 );
-    //gl.drawArrays( gl.TRIANGLE_FANS, 3, 6 );
+    // gl.drawArrays( gl.TRIANGLE_FAN, 3, 6 );
+}
+//任务b：绘制四边形
+function main() {
+    gl = document.getElementById("rectangle-canvas");
+    points = gl.getContext("2d");
+    points.fillStyle = 'rgba(0,0,255,1.0)';
+    points.fillRect(100,100,300,200);
 }
