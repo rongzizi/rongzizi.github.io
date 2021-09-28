@@ -12,18 +12,24 @@ window.onload = function init(){
 
     // Three Vertices
     var vertices = [
-        -1.0, -1.0,
+        // 三角形：
+        /*-1.0, -1.0,
         0.0,  1.0,
-        1.0, -1.0,
-        /*0.0, -1.0,
-        1.0, -1.0,
-        1.0,  1.0,
-        0.0, -1.0,
-        1.0,  1.0,
-        0.0,  1.0*/
-        /*-0.5, -0.5,
-        0.0, 0.5,
-        0.5, -0.5*/
+        1.0, -1.0,*/
+        //任务B：四边形：
+       /* -1.0, -1.0,
+        -1.0, 1.0,
+        1.0, 1.0,
+        1.0, -1.0*/
+        //任务C: 绘制三角形和四边形
+        -1.0, 0.0,
+        -0.5, 1.0,
+        0.0, 0.0,
+        0.0, 0.0,
+        0.0, 1.0,
+        1.0, 1.0,
+        1.0, 0.0
+
     ];
     // Configure WebGL
     gl.viewport( 0, 0, canvas.width, canvas.height );
@@ -44,19 +50,14 @@ window.onload = function init(){
     gl.enableVertexAttribArray( vPosition );
 
     render();
-    // main();
 }
 
 function render(){
     gl.clear( gl.COLOR_BUFFER_BIT );
-    // gl.drawArrays( gl.TRIANGLE_FAN, 0, 4 );
+    //三角形上色：
     gl.drawArrays( gl.TRIANGLES, 0, 3 );
-    // gl.drawArrays( gl.TRIANGLE_FAN, 3, 6 );
+    //四边形上色
+    // gl.drawArrays( gl.TRIANGLE_FAN, 0, 4 );
+    gl.drawArrays( gl.TRIANGLE_FAN, 4, 7 );
 }
-//任务b：绘制四边形
-function main() {
-    gl = document.getElementById("rectangle-canvas");
-    points = gl.getContext("2d");
-    points.fillStyle = 'rgba(0,0,255,1.0)';
-    points.fillRect(100,100,300,200);
-}
+
