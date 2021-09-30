@@ -59,25 +59,36 @@ div{
     width: 200px;
     height: 30px;
 }
-.menu li{
-    text-align: -webkit-match-parent;
-    font-size: 20px;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px cornflowerblue;
-}
 ul li{
     list-style: none;
 }
 a{
-    cursor: pointer;
+    text-decoration: none;
+    color: black;
+}
+a.a1:link, a.a1:visited{
+    color: darkblue;
+    text-align: center;
+    font-weight: bold;
+    font-size: 22px;
+    text-shadow: 2px 2px 4px cornflowerblue;
+    display: inline-block;
+}
+a.a1:hover, a.a1:active{
+    background-color: cadetblue;
+    font-size: 26px;
+}
+a.a2:link, a.a2:visited{
     text-decoration: none;
     color: darkblue;
+    text-align: center;
+    font-weight: bold;
+    font-size: 22px;
+    display: inline-block;
 }
-.a1{
-    color: cornflowerblue;
-}
-.a2{
-    color: darkblue;
+a.a2:hover, a.a2:active{
+    text-decoration: cornflowerblue;
+    font-size: 28px;
 }
 *{
     word-break: break-word;
@@ -115,11 +126,6 @@ p{
     /*width: 50%;*/
     /*float: left;*/
 }
-/*div.in4{
-    width: 50%;
-    text-indent: 2em;
-    float: right;
-}*/
 img.img1{
     width: 30px;
     height: 30px;
@@ -140,9 +146,58 @@ img.touxiang{
     width: 210px;
     height: 180px;
 }
-ul.u1 a{
-    color: brown;
-    padding: 5px;
+a.lab2_task:link, a.lab2_task:visited{
+    padding: 1px 10px;
+    font-size: 18px;
+    color: darkblue;
 }
-
-
+a.lab2_task:hover, a.lab2_task:active{
+    font-size: 22px;
+    color: brown;
+}
+ul.u1{
+    list-style-type: circle;
+}
+div.Lab2{
+    text-align: center;
+}
+div.Lab2-a{
+    display: inline-block;
+    vertical-align: top;
+    text-align: left;
+    width: 130px;
+    height: 30px;
+    background-color: #fffbf0;
+}
+div.Lab2-b{
+    display: inline-block;
+    vertical-align: top;
+    text-align: left;
+    width: 130px;
+    height: 30px;
+    background-color: #fffbf0;
+}
+div.Lab2-c{
+    display: inline-block;
+    vertical-align: top;
+    text-align: left;
+    width: 130px;
+    height: 30px;
+    background-color: #fffbf0;
+}
+div.Lab2-d{
+    display: inline-block;
+    vertical-align: top;
+    text-align: left;
+    width: 130px;
+    height: 30px;
+    background-color: #fffbf0;
+}
+div.Lab2-e{
+    display: inline-block;
+    vertical-align: top;
+    text-align: left;
+    width: 130px;
+    height: 30px;
+    background-color: #fffbf0;
+}

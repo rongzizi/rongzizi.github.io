@@ -59,16 +59,16 @@ window.onload = function initTriangles(){
 };
 
 function triangle( a, b, c ){
-    //var k;
+    var k;
     points.push( a[0], a[1], a[2] );
     points.push( b[0], b[1], b[2] );
     points.push( c[0], c[1], c[2] );
-    // for( k = 0; k < 3; k++ )
-    // 	points.push( a[k] );
-    // for( k = 0; k < 3; k++ )
-    // 	points.push( b[k] );
-    // for( k = 0; k < 3; k++ )
-    // 	points.push( c[k] );
+    for( k = 0; k < 3; k++ )
+    	points.push( a[k] );
+    for( k = 0; k < 3; k++ )
+    	points.push( b[k] );
+    for( k = 0; k < 3; k++ )
+    	points.push( c[k] );
 }
 
 function divideTriangle( a, b, c, count ){
@@ -94,5 +94,6 @@ function divideTriangle( a, b, c, count ){
 
 function renderTriangles(){
     gl.clear( gl.COLOR_BUFFER_BIT );
-    gl.drawArrays( gl.TRIANGLES, 0, points.length/3 );
+    // gl.drawArrays( gl.TRIANGLES, 0, points.length/3 );
+    gl.drawArrays(gl.LINE_LOOP, 0, points.length / 3);
 }
