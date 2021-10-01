@@ -42,7 +42,7 @@ div{
     display: block;
 }
 .name{
-    font-family: "宋体";
+    font-family: Arial, Helvetica, sans-serif;
 }
 .menu{
     width: 300px;
@@ -66,6 +66,9 @@ a{
     text-decoration: none;
     color: black;
 }
+a.mail:hover, a.mail:active{
+    text-decoration: underline;
+}
 a.a1:link, a.a1:visited{
     color: darkblue;
     text-align: center;
@@ -75,7 +78,7 @@ a.a1:link, a.a1:visited{
     display: inline-block;
 }
 a.a1:hover, a.a1:active{
-    background-color: cadetblue;
+    background-color: #A6D7D4;
     font-size: 26px;
 }
 a.a2:link, a.a2:visited{
@@ -99,7 +102,7 @@ a.a2:hover, a.a2:active{
 h2{
     display: block;
     font-size: 1.5em;
-    font-family: "宋体";
+    font-family: 宋体 sans-serif;
     margin-block-start: 0.83em;
     margin-block-end: 0.83em;
     margin-inline-start: 0px;
@@ -123,8 +126,6 @@ p{
 }
 .in3{
     text-indent: 2em;
-    /*width: 50%;*/
-    /*float: left;*/
 }
 img.img1{
     width: 30px;
@@ -147,7 +148,7 @@ img.touxiang{
     height: 180px;
 }
 a.lab2_task:link, a.lab2_task:visited{
-    padding: 1px 10px;
+    padding: 5px 0px;
     font-size: 18px;
     color: darkblue;
 }
@@ -161,43 +162,20 @@ ul.u1{
 div.Lab2{
     text-align: center;
 }
-div.Lab2-a{
-    display: inline-block;
-    vertical-align: top;
-    text-align: left;
-    width: 130px;
-    height: 30px;
-    background-color: #fffbf0;
+div.div2{
+    text-align: center;
+    width: 50%;
 }
-div.Lab2-b{
-    display: inline-block;
-    vertical-align: top;
-    text-align: left;
-    width: 130px;
-    height: 30px;
-    background-color: #fffbf0;
+#Lab2{
+    border-collapse: collapse;
+    width: 70%;
+    height: 50px;
+    text-align: center;
+    margin: 0px auto;
 }
-div.Lab2-c{
-    display: inline-block;
-    vertical-align: top;
-    text-align: left;
-    width: 130px;
-    height: 30px;
-    background-color: #fffbf0;
+#Lab2 td:hover{
+    background-color: #ddd;
 }
-div.Lab2-d{
-    display: inline-block;
-    vertical-align: top;
-    text-align: left;
-    width: 130px;
-    height: 30px;
-    background-color: #fffbf0;
-}
-div.Lab2-e{
-    display: inline-block;
-    vertical-align: top;
-    text-align: left;
-    width: 130px;
-    height: 30px;
-    background-color: #fffbf0;
+#Lab2 tr, #Lab2 td{
+    border: 1px solid #ddd;
 }
