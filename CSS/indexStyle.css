@@ -1,11 +1,17 @@
 body{
     background: linear-gradient(90deg,#cff,#fcc);
 }
+div{
+    margin:0;
+    padding:0;
+}
 .left{
     top: 0;
     left: 0;
     bottom: 0;
     position: fixed;
+    overflow-x: hidden;
+    /*overflow-y: auto;*/
     overflow-y: hidden;
     width: 25%;
     height: 100%;
@@ -15,6 +21,7 @@ body{
     text-align: center;
     float: left;
     box-shadow: 0 10px 8px 0 rgba(0,0,0,0.4), 0 6px 20px 0 rgba(0,0,0,0.2);
+    margin: 0 auto;
 }
 .right{
     top: 0;
@@ -36,7 +43,7 @@ body{
     bottom: 0px;
     right: 0px;
     position: -webkit-sticky;
-    background: rgba(255,255,255,0.5);
+    /*background: rgba(255,255,255,0.5);*/
 }
 div{
     display: block;
@@ -45,22 +52,25 @@ div{
     font-family: Arial, Helvetica, sans-serif;
 }
 .menu{
-    width: 300px;
+    width: 320px;
     height: 100%;
     border-radius: 20px;
     margin-top: 0px;
     padding: 0;
     text-align: center;
 }
-.menu li a{
-    position: relative;
-    float: left;
-    padding: 5px;
-    width: 200px;
-    height: 30px;
+.menu ul{
+    list-style-type: none;
+    margin: 0px;
+    padding: 0px;
+    width: auto;
 }
-ul li{
-    list-style: none;
+li a:first-child {
+    position: relative;
+    display: block;
+    float: left;
+    padding: 5px 20px;
+    width: 280px;
 }
 a{
     text-decoration: none;
@@ -74,7 +84,7 @@ a.a1:link, a.a1:visited{
     text-align: center;
     font-weight: bold;
     font-size: 22px;
-    text-shadow: 2px 2px 4px cornflowerblue;
+    /*text-shadow: 2px 2px 4px cornflowerblue;*/
     display: inline-block;
 }
 a.a1:hover, a.a1:active{
@@ -126,6 +136,10 @@ p{
 }
 .in3{
     text-indent: 2em;
+}
+div.motto p{
+    text-indent: 2em;
+    font-size: 1.1em;
 }
 img.img1{
     width: 30px;

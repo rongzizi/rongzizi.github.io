@@ -2,7 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Lab1</title>
+    <title>Lab1 task d and e</title>
+    <style>
+        #triangle-canvas{
+            width: 500px;
+            height: 500px;
+            float: left;
+            display: inline-block;
+        }
+        div.text{
+            width: 550px;
+            height: 550px;
+            float: left;
+            display: inline-block;
+            margin: 0px;
+            padding: 0px;
+            overflow: hidden;
+        }
+        iframe{
+            width: 550px;
+            height: 550px;
+            overflow-x: hidden;
+            margin: 0px;
+            padding: 0px;
+        }
+
+    </style>
+
     <script id="vertex-shader" type="x-shader/x-vertex">
         attribute vec4 vPosition;
         void main(){
@@ -33,6 +59,10 @@
 </head>
 <body>
 <!--任务a：绘制三角形-->
-    <canvas id="triangle-canvas" style=" border: none;" width="400" height="400"></canvas>
+    <canvas id="triangle-canvas"></canvas>
+    <div class = "text">
+        <iframe src="Lab1-de.html"></iframe>
+    </div>
+
 </body>
 </html>

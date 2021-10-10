@@ -8,7 +8,7 @@ var canvas;
 var points = [];
 var colors = [];
 
-var numTimesToSubdivide = prompt("请输入三角形划分个数：");
+var numTimesToSubdivide = prompt("请输入三角形划分个数：", "4");
 
 window.onload = function init() {
     canvas = document.getElementById("gl-canvas");

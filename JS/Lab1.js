@@ -58,6 +58,6 @@ function render(){
     gl.drawArrays( gl.TRIANGLES, 0, 3 );
     //四边形上色
     // gl.drawArrays( gl.TRIANGLE_FAN, 0, 4 );
-    gl.drawArrays( gl.TRIANGLE_FAN, 4, 7 );
+    gl.drawArrays( gl.TRIANGLE_FAN, 3, 4 );
 }
 
