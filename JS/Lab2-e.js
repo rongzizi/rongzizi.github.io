@@ -11,6 +11,8 @@ var numTimesToSubdivide = 4;
 
 var theta = 60.0;
 
+
+
 window.onload = function initTriangles(){
     canvas = document.getElementById( "gl-canvas" );
 

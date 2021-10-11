@@ -65,6 +65,8 @@
   </component>
   <component name="PropertiesComponent">
     <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
@@ -120,6 +122,8 @@
       <workItem from="1633505112533" duration="31000" />
       <workItem from="1633569949933" duration="736000" />
       <workItem from="1633846995906" duration="10284000" />
+      <workItem from="1633872177904" duration="1889000" />
+      <workItem from="1633957918184" duration="4458000" />
     </task>
     <servers />
   </component>

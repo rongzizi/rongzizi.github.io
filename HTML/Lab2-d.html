@@ -6,13 +6,18 @@
     <title>Lab2-d rotation</title>
     <script id="vertex-shader" type="x-shader/x-vertex">
 	attribute vec4 vPosition;
+	uniform float theta;
 	void main(){
-		gl_Position = vPosition;
+		gl_Position.x = vPosition.x*cos(theta) - vPosition.y*sin(theta);
+		gl_Position.y = vPosition.y*sin(theta) + vPosition.y*cos(theta);
+		gl_Position.z = vPosition.z;
+		gl_Position.w = 1.0;
 	}
+
 	</script>
 
     <script id="fragment-shader" type="x-shader/x-fragment">
-        precision lowp float;
+        precision mediump float;
         void main(){
             gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
         }
@@ -27,8 +32,7 @@
 </head>
 
 <body>
-<h2>Sierpinski Gasket in 2D</h2>
-<canvas id="gl-canvas" width="400" height="400">你的浏览器不支持HTML5 canvas元素</canvas>
-<p>学习中......</p>
+<h2>转是转了，不知道为什么形状会改变</h2>
+<canvas id="gl-canvas" width="500" height="500">你的浏览器不支持HTML5 canvas元素</canvas>
 </body>
 </html>

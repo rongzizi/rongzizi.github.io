@@ -89,6 +89,7 @@ function divideTriangle( a, b, c, count ){
         divideTriangle( a, ab, ca, count );
         divideTriangle( b, bc, ab, count );
         divideTriangle( c, ca, bc, count );
+        divideTriangle( ab, bc, ca, count);
     }
 }
 
