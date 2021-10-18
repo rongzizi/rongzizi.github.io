@@ -7,12 +7,10 @@ var gl;
 
 var points = [];
 
-var numTimesToSubdivide = 4;
+var numTimesToSubdivide = prompt("请输入分割次数：", "4");
 
-var theta = 60.0;
-
-
-
+var theta = prompt("请输入旋转角度", "60");
+// var theta = 0.0;
 window.onload = function initTriangles(){
     canvas = document.getElementById( "gl-canvas" );
 
@@ -24,9 +22,9 @@ window.onload = function initTriangles(){
 
     // first, initialise the corners of the gasket with three points.
     var vertices = [
-        -0.5, -0.5,  0,
-        0.0,  0.5,  0,
-        0.5, -0.5,  0
+        -0.7, -0.7,  0,
+        0.0,  0.7,  0,
+        0.7, -0.7,  0
     ];
 
     // var u = vec3.create();
@@ -104,5 +102,6 @@ function divideTriangle( a, b, c, count ){
 
 function renderTriangles(){
     gl.clear( gl.COLOR_BUFFER_BIT );
-    gl.drawArrays(gl.LINES, 0, points.length / 3);
+    gl.drawArrays(gl.POINTS, 0, 3);
+    // gl.drawArrays(gl.LINES, 0, points.length / 3);
 }

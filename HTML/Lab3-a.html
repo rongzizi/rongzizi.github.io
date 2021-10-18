@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Lab3-a</title>
+    <script id="rot-v-shader" type="x-shader/x-vertex">
+	attribute vec4 vPosition;
+	uniform float theta;
+	attribute vec4 a_color;
+    varying vec4 v_color;
+	void main()
+	{
+		float u = cos( theta );
+		float v = sin( theta );
+
+		gl_Position.x = vPosition.x * u - vPosition.y * v;
+		gl_Position.y = vPosition.x * v + vPosition.y * u;
+		gl_Position.z = 0.0;
+		gl_Position.w = 1.0;
+
+		v_color = a_color;
+	}
+	</script>
+
+    <script id="rot-f-shader" type="x-shader/x-fragment">
+	precision mediump float;
+    varying vec4 v_color;
+	void main()
+	{
+		gl_FragColor = v_color;
+	}
+	</script>
+
+    <script type="text/javascript" src="../JS/common/webgl-utils.js"></script>
+    <script type="text/javascript" src="../JS/common/initShaders.js"></script>
+    <script type="text/javascript" src="../JS/common/gl-matrix-min.js"></script>
+
+    <script type="text/javascript" src="../JS/Lab3-a.js"></script>
+</head>
+
+<body onload="initRotSquare()">
+<canvas id="rot-canvas" width="512" height="512">你的浏览器不支持HTML5 canvas元素</canvas>
+<fieldset style="width: 500px">
+    <legend>转动控制</legend>
+    <button id="direction" onclick="changeDir()">change direction</button>
+    <select id="controls" size="3">
+        <option value="0">change direction</option>
+        <option value="1">fast</option>
+        <option value="2">slow</option>
+    </select>
+</fieldset>
+</body>
+
+</html>

@@ -7,9 +7,9 @@ var gl;
 
 var points = [];
 
-var numTimesToSubdivide = 4;
+var numTimesToSubdivide = prompt("请输入分割次数：", "4");
 
-var theta = 60.0;
+var theta = prompt("请输入旋转度数：","0");
 
 window.onload = function initTriangles(){
     canvas = document.getElementById( "gl-canvas" );
@@ -22,9 +22,9 @@ window.onload = function initTriangles(){
 
     // first, initialise the corners of the gasket with three points.
     var vertices = [
-        -0.5, -0.5,  0,
-        0.0,  0.5,  0,
-        0.5, -0.5,  0
+        -0.7, -0.7,  0,
+        0,  0.7,  0,
+        0.7, -0.7,  0
     ];
 
     // var u = vec3.create();
@@ -54,15 +54,21 @@ window.onload = function initTriangles(){
 
     // associate out shader variables with data buffer
     var vPosition = gl.getAttribLocation( program, "vPosition" );
-
-    //
-    var thetaLoc = gl.getUniformLocation(program, "theta");
-    gl.uniform1f(thetaLoc, theta);
-
     gl.vertexAttribPointer( vPosition, 3, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
+    var u_sinB = gl.getUniformLocation(program, "u_sinB");
+    var u_cosB = gl.getUniformLocation(program, "u_cosB");
+    function rotation(){
+        var sinB = Math.sin(theta/180.0*Math.PI);
+        var cosB = Math.cos(theta/180.0*Math.PI);
+        gl.uniform1f(u_sinB, sinB);
+        gl.uniform1f(u_cosB, cosB);
+        renderTriangles();
+    }
+
     renderTriangles();
+    rotation();
 };
 
 function triangle( a, b, c ){
@@ -104,3 +110,4 @@ function renderTriangles(){
     gl.clear( gl.COLOR_BUFFER_BIT );
     gl.drawArrays(gl.LINES, 0, points.length / 3);
 }
+

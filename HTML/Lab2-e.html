@@ -1,39 +1,38 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-  <title>Lab2-e rotation 升级版</title>
-  <script id="vertex-shader" type="x-shader/x-vertex">
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>Lab2-d rotation</title>
+    <script id="vertex-shader" type="x-shader/x-vertex">
 	attribute vec4 vPosition;
 	uniform float theta;
-
 	void main(){
 		gl_Position.x = vPosition.x*cos(theta) - vPosition.y*sin(theta);
-		gl_Position.y = vPosition.y*sin(theta) + vPosition.y*cos(theta);
+		gl_Position.y = vPosition.x*sin(theta) + vPosition.y*cos(theta);
 		gl_Position.z = vPosition.z;
 		gl_Position.w = 1.0;
 	}
 
 	</script>
 
-  <script id="fragment-shader" type="x-shader/x-fragment">
-        precision mediump float;
+    <script id="fragment-shader" type="x-shader/x-fragment">
+        precision lowp float;
         void main(){
             gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
         }
 	</script>
 
-  <script type="text/javascript" src="../JS/common/webgl-utils.js"></script>
-  <script type="text/javascript" src="../JS/common/initShaders.js"></script>
-  <script type="text/javascript" src="../JS/common/gl-matrix-min.js"></script>
+    <script type="text/javascript" src="../JS/common/webgl-utils.js"></script>
+    <script type="text/javascript" src="../JS/common/initShaders.js"></script>
+    <script type="text/javascript" src="../JS/common/gl-matrix-min.js"></script>
 
-  <script type="text/javascript" src="../JS/Lab2-e.js"></script>
+    <script type="text/javascript" src="../JS/Lab2-e.js"></script>
 
 </head>
 
 <body>
-<h2>Sierpinski Gasket in 2D</h2>
+
 <canvas id="gl-canvas" width="500" height="500">你的浏览器不支持HTML5 canvas元素</canvas>
 </body>
 </html>

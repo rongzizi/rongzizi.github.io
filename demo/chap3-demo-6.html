@@ -1,24 +1,31 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <title>Lab2-d rotation</title>
-
+    <title>Chap3 Demo -- Continue Dot Square using Mouse Down</title>
     <script id="vertex-shader" type="x-shader/x-vertex">
 	attribute vec4 vPosition;
-	uniform float u_sinB, u_cosB;
-	void main(){
-		gl_Position.x = vPosition.x*u_cosB - vPosition.y*u_sinB;
-		gl_Position.y = vPosition.x*u_sinB + vPosition.y*u_cosB;
-		gl_Position.z = vPosition.z;
-		gl_Position.w = vPosition.w;
+	attribute vec4 vColor;
+
+	varying vec4 fColor;
+
+	void main()
+	{
+		gl_Position = vPosition;
+		fColor = vColor;
+		gl_PointSize = 10.0;
 	}
 	</script>
+
     <script id="fragment-shader" type="x-shader/x-fragment">
 	precision mediump float;
-	void main(){
-		gl_FragColor = vec4( 1.0, 0.0, 0.0, 1.0 );
+
+	varying vec4 fColor;
+
+	void main()
+	{
+		gl_FragColor = fColor;
 	}
 	</script>
 
@@ -26,12 +33,13 @@
     <script type="text/javascript" src="../JS/common/initShaders.js"></script>
     <script type="text/javascript" src="../JS/common/gl-matrix-min.js"></script>
 
-    <script type="text/javascript" src="../JS/Lab2-d.js"></script>
-
+    <script type="text/javascript" src="../JS/demo/drawsquaredotcont.js"></script>
 </head>
 
-<body>
-<canvas id="gl-canvas" width="512" height="512">你的浏览器不支持HTML5 canvas元素</canvas>
-
+<body onload="initSquare()">
+<h1>Continue Dot Squares using Mouse Down</h1>
+<canvas id="dot-canvas" width="512" height="512">你的浏览器不支持HTML5 canvas元素
+</canvas>
 </body>
+
 </html>

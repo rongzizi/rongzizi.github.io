@@ -162,7 +162,7 @@ img.touxiang{
     height: 180px;
 }
 a.lab2_task:link, a.lab2_task:visited{
-    padding: 5px 0px;
+    padding: 5px 0;
     font-size: 18px;
     color: darkblue;
 }
@@ -170,10 +170,22 @@ a.lab2_task:hover, a.lab2_task:active{
     font-size: 22px;
     color: brown;
 }
+a.lab3_task:link, a.lab3_task:visited{
+    padding: 5px 0;
+    font-size: 18px;
+    color: darkblue;
+}
+a.lab3_task:hover, a.lab3_task:active{
+    font-size: 22px;
+    color: brown;
+}
 ul.u1{
     list-style-type: circle;
 }
 div.Lab2{
+    text-align: center;
+}
+div.Lab3{
     text-align: center;
 }
 div.div2{
@@ -191,5 +203,18 @@ div.div2{
     background-color: #ddd;
 }
 #Lab2 tr, #Lab2 td{
+    border: 1px solid #ddd;
+}
+#Lab3{
+    border-collapse: collapse;
+    width: 70%;
+    height: 50px;
+    text-align: center;
+    margin: 0 auto;
+}
+#Lab3 td:hover{
+    background-color: #ddd;
+}
+#Lab3 tr, #Lab3 td{
     border: 1px solid #ddd;
 }
