@@ -2,6 +2,8 @@
 
 var canvas;
 var gl;
+var vertices=[];
+var colorData=[];
 
 var theta = 0.0;
 var thetaLoc;
@@ -24,43 +26,49 @@ function initRotSquare(){
     if( !gl ){
         alert( "WebGL isn't available" );
     }
+    //=====================头部：圆形的绘制======================
+    var N = 100;
+    var circleData = [0.0, 0.75];
+    var r = 0.25;
+    colorData = [0.25, 0.25, 0.25];
+    for(var i=0; i<= N; i++){
+        var theta = i * 2 * Math.PI / N;
+        var x = r * Math.sin(theta) ;
+        var y = r * Math.cos(theta) + 0.75;
+        circleData.push(x, y);
+        colorData.push(0.25, 0.25, 0.25);
+    }
+    function body(){
+        //三角形（身体）
+        circleData.push(0.0, 0.5);
+        circleData.push(-0.5, -0.25);
+        circleData.push(0.5, -0.25);
+        for(var u =0; u<3;u++){
+            colorData.push(0.31, 0.58, 0.8);
+        }
+        //手
+        circleData.push( 0.33, 0.0);
+        circleData.push(0.65, 0.2);
+        circleData.push(0.6, 0.25);
+        circleData.push(0.27, 0.098);
+        //左脚
+        circleData.push(-0.1, -0.25);
+        circleData.push(-0.25, -0.25);
+        circleData.push(-0.25, -0.75);
+        circleData.push(-0.1, -0.75);
+        //右脚
+        circleData.push(0.1, -0.25);
+        circleData.push(0.25, -0.25);
+        circleData.push(0.25, -0.75);
+        circleData.push(0.1, -0.75);
 
-    var triangleData = new Float32Array([
-        0.0, 0.75, 0.25, 0.25, 0.25,    //头部
-        0.0, 0.5, 0.25, 0.25, 0.25,
-        0.15, 0.55, 0.25, 0.25, 0.25,
-        0.25, 0.66, 0.25, 0.25, 0.25,
-        0.25, 0.85, 0.25, 0.25, 0.25,
-        0.125, 0.95, 0.25, 0.25, 0.25,
-        0.0, 0.98, 0.25, 0.25, 0.25,
-        -0.125, 0.95, 0.25, 0.25, 0.25,
-        -0.25, 0.85, 0.25, 0.25, 0.25,
-        -0.25, 0.66, 0.25, 0.25, 0.25,
-        -0.15, 0.55, 0.25, 0.25, 0.25,
-        0.0, 0.5, 0.25, 0.25, 0.25,
+        for(var v=0; v<12;v++)
+            colorData.push(0.98, 0.92, 0.843);
+    }
+    body();
 
-        0.0, 0.5, 0.31, 0.58, 0.8,      //身体
-        -0.5, -0.25, 0.31, 0.58, 0.8,
-        0.5, -0.25, 0.31, 0.58, 0.8,
+    vertices = new Float32Array(circleData);
 
-        0.33, 0.0, 0.98, 0.92, 0.843,       //手
-        0.65, 0.2, 0.98, 0.92, 0.843,
-        0.6, 0.25, 0.98, 0.92, 0.843,
-        0.27, 0.098, 0.98, 0.92, 0.843,
-
-        -0.1, -0.25, 0.98, 0.92, 0.843,     //左脚
-        -0.25, -0.25, 0.98, 0.92, 0.843,
-        -0.25, -0.75, 0.98, 0.92, 0.843,
-        -0.1, -0.75, 0.98, 0.92, 0.843,
-
-        0.1, -0.25, 0.98, 0.92, 0.843,      //右脚
-        0.25, -0.25, 0.98, 0.92, 0.843,
-        0.25, -0.75, 0.98, 0.92, 0.843,
-        0.1, -0.75, 0.98, 0.92, 0.843,
-
-
-    ]);
-    var FSIZE = triangleData.BYTES_PER_ELEMENT;
     // Configure WebGL
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
@@ -72,15 +80,19 @@ function initRotSquare(){
     // Load the data into the GPU
     var buffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, buffer );
-    gl.bufferData( gl.ARRAY_BUFFER, triangleData, gl.STATIC_DRAW );
+    gl.bufferData( gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW );
 
     // Associate external shader variables with data buffer
     var vPosition = gl.getAttribLocation( program, "vPosition" );
-    gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, FSIZE*5, 0 );
+    gl.vertexAttribPointer( vPosition, 2, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
 
+    var colorBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, colorBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(colorData), gl.STATIC_DRAW);
+
     var a_color = gl.getAttribLocation(program, "a_color");
-    gl.vertexAttribPointer(a_color, 3, gl.FLOAT, false, FSIZE*5, FSIZE*2);
+    gl.vertexAttribPointer(a_color, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(a_color);
 
     u_rotate = gl.getUniformLocation(program, "u_rotate");
@@ -113,11 +125,12 @@ function renderSquare(){
     gl.uniformMatrix4fv(u_rotate, false, rotateMatrix(theta));
 
     // gl.drawArrays( gl.TRIANGLE_STRIP, 0, 4 );
-    gl.drawArrays(gl.TRIANGLE_FAN, 0, 12)
-    gl.drawArrays(gl.TRIANGLES, 12, 3);
-    gl.drawArrays(gl.TRIANGLE_FAN, 15, 4);
-    gl.drawArrays(gl.TRIANGLE_FAN, 19, 4);
-    gl.drawArrays(gl.TRIANGLE_FAN, 23, 4);
+    gl.drawArrays( gl.TRIANGLE_FAN, 0, 102 );
+    console.log(vertices.length/2);
+    gl.drawArrays( gl.TRIANGLE_FAN, 102, 3);
+    gl.drawArrays(gl.TRIANGLE_FAN, 105, 4);
+    gl.drawArrays(gl.TRIANGLE_FAN, 109, 4);
+    gl.drawArrays(gl.TRIANGLE_FAN, 113, 4);
 
     // update and render
     count = setTimeout( function (){ requestAnimFrame( renderSquare ); }, delay );
