@@ -3,16 +3,22 @@
 
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-    <title>Lab2-d rotation</title>
+    <title>Lab2-e rotation</title>
     <script id="vertex-shader" type="x-shader/x-vertex">
-	attribute vec4 vPosition;
-	uniform float theta;
-	void main(){
-		gl_Position.x = vPosition.x*cos(theta) - vPosition.y*sin(theta);
-		gl_Position.y = vPosition.x*sin(theta) + vPosition.y*cos(theta);
-		gl_Position.z = vPosition.z;
-		gl_Position.w = 1.0;
-	}
+        attribute vec4 vPosition;
+        uniform float theta;
+
+        void main()
+        {
+            float d = sqrt( vPosition.x*vPosition.x + vPosition.y*vPosition.y );
+            float u = cos( d*theta );
+            float v = sin( d*theta );
+
+            gl_Position.x = vPosition.x * u - vPosition.y * v;
+            gl_Position.y = vPosition.x * v + vPosition.y * u;
+            gl_Position.z = 0.0;
+            gl_Position.w = 1.0;
+        }
 
 	</script>
 
@@ -34,5 +40,8 @@
 <body>
 
 <canvas id="gl-canvas" width="500" height="500">你的浏览器不支持HTML5 canvas元素</canvas>
+<!--<label>请输入分割次数：</label><input id="num" type="text" width="50" height="20">
+<label>请输入旋转角度：</label><input id="angle" type="text" width="50" height="20">
+<input type="button" value="确定" onclick="load()">-->
 </body>
 </html>

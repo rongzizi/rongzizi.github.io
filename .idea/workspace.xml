@@ -13,8 +13,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="HTML File" />
         <option value="JavaScript File" />
+        <option value="HTML File" />
       </list>
     </option>
   </component>
@@ -94,6 +94,21 @@
       <recent name="D:\BaiduNetdiskDownload\github\rongzizi.github.io\JS\demo" />
     </key>
   </component>
+  <component name="RunManager">
+    <configuration default="true" type="ArquillianTestNG" factoryName="" nameIsGenerated="true">
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="TEST_OBJECT" value="CLASS" />
+      <properties />
+      <listeners />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
@@ -130,7 +145,12 @@
       <workItem from="1634539945796" duration="5184000" />
       <workItem from="1634552595808" duration="5867000" />
       <workItem from="1634565373457" duration="7110000" />
-      <workItem from="1634649602781" duration="660000" />
+      <workItem from="1634649602781" duration="845000" />
+      <workItem from="1638682903989" duration="84000" />
+      <workItem from="1638683020529" duration="33000" />
+      <workItem from="1638683086711" duration="11000" />
+      <workItem from="1638683141320" duration="18830000" />
+      <workItem from="1638756737178" duration="20966000" />
     </task>
     <servers />
   </component>

@@ -170,15 +170,7 @@ a.lab2_task:hover, a.lab2_task:active{
     font-size: 22px;
     color: brown;
 }
-a.lab3_task:link, a.lab3_task:visited{
-    padding: 5px 0;
-    font-size: 18px;
-    color: darkblue;
-}
-a.lab3_task:hover, a.lab3_task:active{
-    font-size: 22px;
-    color: brown;
-}
+
 ul.u1{
     list-style-type: circle;
 }
@@ -192,29 +184,17 @@ div.div2{
     text-align: center;
     width: 50%;
 }
-#Lab2{
-    border-collapse: collapse;
-    width: 70%;
-    height: 50px;
-    text-align: center;
-    margin: 0px auto;
-}
-#Lab2 td:hover{
-    background-color: #ddd;
-}
-#Lab2 tr, #Lab2 td{
-    border: 1px solid #ddd;
-}
-#Lab3{
+
+table.Lab {
     border-collapse: collapse;
     width: 70%;
     height: 50px;
     text-align: center;
     margin: 0 auto;
 }
-#Lab3 td:hover{
-    background-color: #ddd;
+table.Lab td:hover{
+    background-color: #A6D7D4;
 }
-#Lab3 tr, #Lab3 td{
+table.Lab tr, table.Lab td{
     border: 1px solid #ddd;
 }

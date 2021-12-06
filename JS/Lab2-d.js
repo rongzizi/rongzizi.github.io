@@ -9,7 +9,7 @@ var points = [];
 
 var numTimesToSubdivide = prompt("请输入分割次数：", "4");
 
-var theta = prompt("请输入旋转度数：","0");
+var theta = prompt("请输入旋转度数：","60");
 
 window.onload = function initTriangles(){
     canvas = document.getElementById( "gl-canvas" );
@@ -110,4 +110,3 @@ function renderTriangles(){
     gl.clear( gl.COLOR_BUFFER_BIT );
     gl.drawArrays(gl.LINES, 0, points.length / 3);
 }
-

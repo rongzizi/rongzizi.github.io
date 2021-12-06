@@ -4,13 +4,15 @@ const { vec3 } = glMatrix;
 
 var canvas;
 var gl;
+var thetaLoc;
+
 
 var points = [];
 
-var numTimesToSubdivide = prompt("请输入分割次数：", "4");
+var numTimesToSubdivide =prompt("请输入分割次数：","4");
+var angle =prompt("请输入旋转角度","60");
+var theta=angle / 360 * Math.PI * 2;
 
-var theta = prompt("请输入旋转角度", "60");
-// var theta = 0.0;
 window.onload = function initTriangles(){
     canvas = document.getElementById( "gl-canvas" );
 
@@ -18,27 +20,6 @@ window.onload = function initTriangles(){
     if( !gl ){
         alert( "WebGL isn't available" );
     }
-    // initialise data for Sierpinski gasket
-
-    // first, initialise the corners of the gasket with three points.
-    var vertices = [
-        -0.7, -0.7,  0,
-        0.0,  0.7,  0,
-        0.7, -0.7,  0
-    ];
-
-    // var u = vec3.create();
-    // vec3.set( u, -1, -1, 0 );
-    var u = vec3.fromValues( vertices[0], vertices[1], vertices[2] );
-    // var v = vec3.create();
-    // vec3.set( v, 0, 1, 0 );
-    var v = vec3.fromValues( vertices[3], vertices[4], vertices[5] );
-    // var w = vec3.create();
-    // vec3.set( w, 1, -1, 0 );
-    var w = vec3.fromValues( vertices[6], vertices[7], vertices[8] );
-
-    divideTriangle( u, v, w, numTimesToSubdivide );
-
     // configure webgl
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
@@ -47,6 +28,30 @@ window.onload = function initTriangles(){
     var program = initShaders( gl, "vertex-shader", "fragment-shader" );
     gl.useProgram( program );
 
+    // initialise data for Sierpinski gasket
+
+    // first, initialise the corners of the gasket with three points.
+    /*var vertices = [
+        -0.5, -0.5,  0,
+        0,  0.5,  0,
+        0.5, -0.5,  0
+        /!*-1, -1, 0,
+        0, 1, 0,
+        1, -1, 0*!/
+    ];*/
+
+    var u = vec3.create();
+    vec3.set( u, -0.5, -0.5, 0 );
+    // var u = vec3.fromValues( vertices[0], vertices[1], vertices[2] );
+    var v = vec3.create();
+    vec3.set( v, 0, 0.5, 0 );
+    // var v = vec3.fromValues( vertices[3], vertices[4], vertices[5] );
+    var w = vec3.create();
+    vec3.set( w, 0.5, -0.5, 0 );
+    // var w = vec3.fromValues( vertices[6], vertices[7], vertices[8] );
+    divideTriangle( u, v, w, numTimesToSubdivide );
+
+
     // load data into gpu
     var vertexBuffer = gl.createBuffer();
     gl.bindBuffer( gl.ARRAY_BUFFER, vertexBuffer );
@@ -54,14 +59,9 @@ window.onload = function initTriangles(){
 
     // associate out shader variables with data buffer
     var vPosition = gl.getAttribLocation( program, "vPosition" );
-
-    //
-    var thetaLoc = gl.getUniformLocation(program, "theta");
-    gl.uniform1f(thetaLoc, theta);
-
     gl.vertexAttribPointer( vPosition, 3, gl.FLOAT, false, 0, 0 );
     gl.enableVertexAttribArray( vPosition );
-
+    thetaLoc = gl.getUniformLocation(program, "theta");
     renderTriangles();
 };
 
@@ -80,7 +80,7 @@ function triangle( a, b, c ){
 
 function divideTriangle( a, b, c, count ){
     // check for end of recursion
-    if( count == 0 ){
+    if( count === 0 ){
         triangle( a, b, c );
     }else{
         var ab = vec3.create();
@@ -96,12 +96,12 @@ function divideTriangle( a, b, c, count ){
         divideTriangle( a, ab, ca, count );
         divideTriangle( b, bc, ab, count );
         divideTriangle( c, ca, bc, count );
-        divideTriangle( ab, bc, ca, count);
+        divideTriangle( ab, bc, ca,count );
     }
 }
 
 function renderTriangles(){
     gl.clear( gl.COLOR_BUFFER_BIT );
-    gl.drawArrays(gl.POINTS, 0, 3);
-    // gl.drawArrays(gl.LINES, 0, points.length / 3);
+    gl.uniform1f( thetaLoc, theta );
+    gl.drawArrays( gl.LINES, 0, points.length/3 );
 }
