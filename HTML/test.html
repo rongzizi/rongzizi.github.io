@@ -1,43 +1,72 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-  <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
-  <title>Lab2</title>
-  <script id="vertex-shader" type="x-shader/x-vertex">
-	attribute vec4 vPosition;
-	void main(){
-		gl_Position = vPosition;
-	}
-	</script>
+  <meta charset=utf-8>
+  <title>我的第一个Three.js案例</title>
+  <style>
+    body {
+      margin: 0;
+    }
 
-  <script id="fragment-shader" type="x-shader/x-fragment">
-	precision mediump float;
-	uniform vec4 u_color;
-	void main(){
-		gl_FragColor = u_color;
-	}
-	</script>
-
-  <script type="text/javascript" src="../JS/common/webgl-utils.js"></script>
-  <script type="text/javascript" src="../JS/common/initShaders.js"></script>
-  <script type="text/javascript" src="../JS/common/gl-matrix-min.js"></script>
-
-  <script type="text/javascript" src="../JS/test.js"></script>
-  <style type="text/css">
-    body{
-      text-align:center
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
     }
   </style>
 </head>
+<body onload="init()">
+<script src="../JS/common/three.js"></script>
+<script>
+  //声明一些全局变量
+  var renderer, camera, scene, geometry, material, mesh;
 
-<body>
-<h2>非刚性旋转</h2>
-请输入递归次数：<input type="text" id="mvalue" placeholder="请输入值"/>
-<br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp请输入theta值：&nbsp&nbsp<input type="text" id="theta" placeholder="请输入值"/>
-<input type="button" value="确定" onclick="main()"/>
-<br><br>
-<canvas id="gl-canvas" width="512" height="512">你的浏览器不支持HTML5 canvas元素</canvas>
+  //初始化渲染器
+  function initRenderer() {
+    renderer = new THREE.WebGLRenderer(); //实例化渲染器
+    renderer.setSize(window.innerWidth, window.innerHeight); //设置宽和高
+    document.body.appendChild(renderer.domElement); //添加到dom
+  }
+
+  //初始化场景
+  function initScene() {
+    scene = new THREE.Scene(); //实例化场景
+  }
+
+  //初始化相机
+  function initCamera() {
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 200); //实例化相机
+    camera.position.set(0, 0, 15);
+  }
+
+  //创建模型
+  function initMesh() {
+    geometry = new THREE.BoxGeometry( 2, 2, 2 ); //创建几何体
+    material = new THREE.MeshNormalMaterial(); //创建材质
+
+    mesh = new THREE.Mesh( geometry, material ); //创建网格
+    scene.add( mesh ); //将网格添加到场景
+  }
+
+  //运行动画
+  function animate() {
+    requestAnimationFrame(animate); //循环调用函数
+
+    mesh.rotation.x += 0.01; //每帧网格模型的沿x轴旋转0.01弧度
+    mesh.rotation.y += 0.02; //每帧网格模型的沿y轴旋转0.02弧度
+
+    renderer.render( scene, camera ); //渲染界面
+  }
+
+  //初始化函数，页面加载完成是调用
+  function init() {
+    initRenderer();
+    initScene();
+    initCamera();
+    initMesh();
+
+    animate();
+  }
+</script>
 </body>
-
 </html>
