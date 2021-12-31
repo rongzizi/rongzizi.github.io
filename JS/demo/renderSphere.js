@@ -52,7 +52,7 @@ function Renderer( canvasName, vertSrc, fragSrc )
     var vBuffer = null;
     var nBuffer = null;
 
-    var numOfSubdivides = 2;
+    var numOfSubdivides = 5;
 
     var progID = 0;
     var vertID = 0;

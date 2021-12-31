@@ -1,635 +1,514 @@
 "use strict";
 
-const{ vec2, vec3, vec4, mat3, mat4, quat } = glMatrix;
+const {
+    vec3,
+    vec4,
+    mat3,
+    mat4
+} = glMatrix;
 
-var canvas;
-var gl;
-var programtex;
-var programskybox;
+function Renderer(canvasName, vertSrc, fragSrc) {
+    var canvas;
+    var gl;
 
-var objFileInput;
-var textureFileInput;
-var bumpFileInput;
+    var near = 0.01;
+    //var near = -200;
+    var far = 200;
+    var radius = 30.0;
+    var theta = 45.0;
+    var phi = 45.0;
+    var stept = 2;
+    var stepm = 0.1;
 
-var meshdata = null;
-var mesh = null;
-var meshinited = false;
+    var fovy = 60.0 * Math.PI / 180.0;
+    var left = -5.0;
+    var right = 5.0;
+    var ytop = 5.0;
+    var ybottom = -5.0;
 
-var texture = null;
-var texImage = null;
-var bumpTexture = null;
-var bumpTexImage = null;
+    var eye = vec3.create();
+    var at = vec3.fromValues(0.0, 0.0, 0.0);
+    var up = vec3.fromValues(0.0, 1.0, 0.0);
 
-var cubemapTexture = null;
+    var dtx = 0;
+    var dty = 0;
+    var dtz = 0;
 
-var eye = vec3.fromValues( 0, 0, 1);
-var at = vec3.fromValues( 0.0, 0.0, 0.0 );
-var up = vec3.fromValues( 0.0, 1.0, 0.0 );
+    var sx = 1;
+    var sy = 1;
+    var sz = 1;
 
-var meshNormalBuffer = null;
-var meshTextureBuffer = null;
-var meshVertexBuffer = null;
-var meshIndexBuffer = null;
+    var dx = 0;
+    var dy = 0;
+    var dz = 0;
 
-var side = 100;
-var points = [];
-var normals = [];
-var texCoords = [];
+    var progID = 0;
+    var vertID = 0;
+    var fragID = 0;
+    var vertSrc = vertSrc;
+    var fragSrc = fragSrc;
 
-var skyboxPoints = [];
-var skyboxNormals = [];
-var skyboxtexCoords = [];
-var skyboxIndices = [];
+    var meshdata;
+    var mesh;
 
-var baseColor = vec4.fromValues(1.0, 0.0, 0.0, 1.0);
-var textureAlpha = 1.0;
-var bumpDepth = 0;
+    var vertexLoc = null;
+    var normalLoc = null;
 
-var matShininess = 1.0;
-var matSmoothness = 0;
-var shadowDepth = 0;
+    var materialKaLoc = null;
+    var materialKdLoc = null;
+    var materialKsLoc = null;
 
-var averageBrightness = 0.0;
-var maxBrightness = 0.0;
+    var ambientProdLoc = null;
+    var diffuseProdLoc = null;
+    var specularProdLoc = null;
 
-var modelViewMatrix = mat4.create();
-var projectionMatrix = mat4.create();
-var normalMatrix = mat3.create();
-var invModelViewMatrix = mat4.create();
+    var modelViewMatrixLoc = null;
+    var projectionMatrixLoc = null;
+    var normalMatrixLoc = null;
 
-var skyboxModelViewMatrix = mat4.create();
-var skyboxProjectionMatrix = mat4.create();
+    var lightPositionLoc = null;
+    var shininessLoc = null;
 
-var modelViewMatrixLoc = null;
-var projectionMatrixLoc = null;
-var normalMatrixLoc = null;
-var invModelViewMatrixLoc = null;
+    var iBuffer = null;
+    var nBuffer = null;
+    var useObjNormal = true;
 
-var positionLoc = null;
-var normalLoc = null;
-var iBuffer = null;
+    var points = [];
+    var normals = [];
 
-var skyboxvBuffer = null;
-var skyboxnBuffer = null;
-var skyboxiBuffer = null;
-var skyboxpointsLoc = null;
-var skyboxnormalsLoc = null;
-var skyboxtexcoordsLoc = null;
+    var modeVal = 1;
+    var colorMode = 1;
+    this.modelFile = null;
 
-var colorLoc = null;
+    var lightPosition = vec4.create();
+    var lightAmbient = vec4.create();
+    var lightDiffuse = vec4.create();
+    var lightSpecular = vec4.create();
 
-var length = 20;
-var left = -length;
-var right = length;
-var ytop = length;
-var ybottom = -length;
-var near = -length;
-var far = length;
-var pnear = 0.01;
-var pfar = 200;
-var radius = 5;
-var theta = 0.0;
-var phi = 0.0;
+    var mka = 1.0;
+    var mkd = 1.0;
+    var mks = 1.0;
+    var mksh = 128;
 
-var fovy = 60 * Math.PI / 180.0;
-var aspect;
+    var materialAmbient = vec4.create();
+    var materialDiffuse = vec4.create();
+    var materialSpecular = vec4.create();
+    var materialShininess = 1.0;
 
-/* object position */
-var dx = 0;
-var dy = 0;
-var dz = 0;
-var dirx = 1;
-var diry = 1;
+    var clearColor = vec4.fromValues(0.225, 0.535, 0.505, 1.0);
 
-var dxt = 0;
-var dyt = 0;
-var dzt = 0;
+    var materialKa = 1.0;
+    var materialKd = 1.0;
+    var materialKs = 1.0;
 
-var sx = 1;
-var sy = 1;
-var sz = 1;
+    var modelViewMatrix = mat4.create();
+    var projectionMatrix = mat4.create();
+    var normalMatrix = mat3.create();
 
-var shininess = 1.0;
-var materialKa = 1.0;
-var materialKd = 1.0;
-var materialKs = 1.0;
+    this.init = function() {
+        canvas = document.getElementById(canvasName);
+        gl = WebGLUtils.setupWebGL(canvas);
 
-var mouseDown = false;
-var lastMouseX = null;
-var lastMouseY = null;
+        gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.enable(gl.DEPTH_TEST);
 
-window.onload = function initWindow(){
-    canvas = document.getElementById( "gl-canvas" );
+        initInterface();
 
-    gl = WebGLUtils.setupWebGL( canvas );
-    if( !gl ){
-        alert( "WebGL isn't available" );
-    }
+        setupShaders();
 
-    gl.clearColor( 0.0, 1.0, 1.0, 1.0 );
-    gl.enable( gl.DEPTH_TEST );
-    //gl.enable( gl.CULL_FACE );
-
-    programskybox = initShaders( gl, "vshader-skybox", "fshader-skybox" );
-    gl.useProgram( programskybox );
-
-    skyboxpointsLoc = gl.getAttribLocation( programskybox, "vPosition" );
-    skyboxtexcoordsLoc = gl.getAttribLocation(programskybox, "vTexCoords" );
-
-    programtex = initShaders( gl, "vshader-objtex", "fshader-objtex" );
-    gl.useProgram( programtex ); // 可更改
-
-    positionLoc = gl.getAttribLocation( programtex, "vPosition" );
-    normalLoc = gl.getAttribLocation( programtex, "vNormal" );
-
-    initInterface();
-
-    configureCubeMapTexture();
-
-    if( texture === null ){
-        var url = "../../images/textures/world.jpg";
-        configureTexture( url );
-    }
-
-    if( bumpTexture === null ){
-        var url = "../../images/textures/roof.jpg";
-        configureBumpTexture(url);
-    }
-
-    buildSkyBox();
-
-    initObjBuffers();
-
-    render();
-}
-
-function initObjBuffers(){
-    meshNormalBuffer = gl.createBuffer();
-    meshTextureBuffer = gl.createBuffer();
-    meshVertexBuffer = gl.createBuffer();
-    meshIndexBuffer = gl.createBuffer();
-}
-
-function requestCORSIfNotSameOrigin(img, url) {
-    if ((new URL(url, window.location.href)).origin !== window.location.origin) {
-        img.crossOrigin = "";
-    }
-}
-
-function handleMouseDown(event) {
-    mouseDown = true;
-    lastMouseX = event.clientX;
-    lastMouseY = event.clientY;
-}
-
-function handleMouseUp(event) {
-    mouseDown = false;
-}
-
-function handleMouseMove(event) {
-    if (!mouseDown)
-        return;
-
-    var newX = event.clientX;
-    var newY = event.clientY;
-
-    var deltaX = (newX - lastMouseX);
-    //console.log("x: "+deltaX);
-    //var deltaX = (newX - lastMouseX)%180;
-    var d = deltaX;
-    //dyt = parseFloat(dyt) + parseFloat(d);
-    //cx = cx + parseFloat(d);
-    theta = theta - parseFloat(d)*0.2;
-
-    var deltaY = (newY - lastMouseY);
-    //console.log("y:" + deltaY);
-    //var deltaY = (newY - lastMouseY)%180;
-    d = deltaY;
-    //dxt = parseFloat(dxt) + parseFloat(d);
-
-    //cy = cy + parseFloat(d);
-    phi = phi - parseFloat(d)*0.2;
-
-    lastMouseX = newX;
-    lastMouseY = newY;
-    buildModelViewProj();
-}
-
-
-function configureTexture( url ){
-    texture = gl.createTexture();
-    //gl.activeTexture( gl.TEXTURE1 );
-    texImage = null;
-    texImage = new Image();
-    texImage.onload = function(){
-        gl.bindTexture( gl.TEXTURE_2D, texture );
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-        gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texImage );
-
-        if(isPowerOf2(texImage.width) && isPowerOf2(texImage.height)){
-            gl.generateMipmap(gl.TEXTURE_2D);
-            gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR );
-            gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
-        }else{
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-        }
+        initCoefficients();
     };
-    requestCORSIfNotSameOrigin(texImage, url);
-    texImage.src = url;
-}
 
-function configureBumpTexture( url ){
-    bumpTexture = gl.createTexture();
-    //gl.activeTexture( gl.TEXTURE1 );
-    bumpTexImage = null;
-    bumpTexImage = new Image();
-    bumpTexImage.onload = function(){
-        gl.bindTexture( gl.TEXTURE_2D, bumpTexture );
-        gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-        gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, bumpTexImage );
-        gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR );
-        gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR );
-    };
-    requestCORSIfNotSameOrigin(bumpTexImage, url);
-    bumpTexImage.src = url;
-}
+    function initInterface() {
+        document.getElementById("slider-ka").addEventListener("input", function(event) {
+            var vka = event.target.value;
+            materialKa = parseFloat(vka);
+            document.getElementById("slider-ka-value").innerHTML = materialKa;
+        });
 
-var faceUrl = [
-    '../../images/textures/posx.jpg',
-    '../../images/textures/negx.jpg',
-    '../../images/textures/negy.jpg',
-    '../../images/textures/posy.jpg',
-    '../../images/textures/posz.jpg',
-    '../../images/textures/negz.jpg',
-];
+        document.getElementById("slider-kd").addEventListener("input", function(event) {
+            var vkd = event.target.value;
+            materialKd = parseFloat(vkd);
+            document.getElementById("slider-kd-value").innerHTML = materialKd;
+        });
 
-var cubemap_image_cnt = 0;
-var cubemap_image = [];
+        document.getElementById("slider-ks").addEventListener("input", function(event) {
+            var vks = event.target.value;
+            materialKs = parseFloat(vks);
+            document.getElementById("slider-ks-value").innerHTML = materialKs;
+        });
 
-function configureCubeMapTexture(){
-    cubemapTexture = gl.createTexture();
-    //gl.activeTexture( gl.TEXTURE0 );
-    gl.bindTexture( gl.TEXTURE_CUBE_MAP, cubemapTexture );
-    for( var i = 0; i < 6; i++ ){
-        cubemap_image[i] = new Image();
-        cubemap_image[i].onload = function(){
-            if( ++cubemap_image_cnt<6)
-                return;
+        document.getElementById("slider-sh").addEventListener("input", function(event) {
+            var vksh = event.target.value;
+            materialShininess = parseInt(vksh);
+            document.getElementById("slider-sh-value").innerHTML = materialShininess;
+        });
 
-            var totalBrightness = 0;
-            var thiscanvas;
+        document.getElementById("ka-color").addEventListener("input", function(event) {
+            var hexcolor = event.target.value.substring(1);
+            var rgbHex = hexcolor.match(/.{1,2}/g);
+            materialAmbient = vec4.fromValues(
+                parseInt(rgbHex[0], 16) * 1.0 / 255.0,
+                parseInt(rgbHex[1], 16) * 1.0 / 255.0,
+                parseInt(rgbHex[2], 16) * 1.0 / 255.0,
+                1.0
+            );
+        });
 
-            for( var k = 0; k < 6; k++ ){
+        document.getElementById("kd-color").addEventListener("input", function(event) {
+            var hexcolor = event.target.value.substring(1);
+            var rgbHex = hexcolor.match(/.{1,2}/g);
+            materialDiffuse = vec4.fromValues(
+                parseInt(rgbHex[0], 16) * 1.0 / 255.0,
+                parseInt(rgbHex[1], 16) * 1.0 / 255.0,
+                parseInt(rgbHex[2], 16) * 1.0 / 255.0,
+                1.0
+            );
+        });
 
-                gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-                gl.texImage2D( gl.TEXTURE_CUBE_MAP_POSITIVE_X + k , 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, cubemap_image[k] );
+        document.getElementById("ks-color").addEventListener("input", function(event) {
+            var hexcolor = event.target.value.substring(1);
+            var rgbHex = hexcolor.match(/.{1,2}/g);
+            materialSpecular = vec4.fromValues(
+                parseInt(rgbHex[0], 16) * 1.0 / 255.0,
+                parseInt(rgbHex[1], 16) * 1.0 / 255.0,
+                parseInt(rgbHex[2], 16) * 1.0 / 255.0,
+                1.0
+            );
+        });
 
-                thiscanvas = document.createElement("canvas");
-                thiscanvas.width = cubemap_image[k].width;
-                thiscanvas.height = cubemap_image[k].height;
-                var context = thiscanvas.getContext("2d");
-                context.drawImage(cubemap_image[k], 0, 0 );
-                var imgData = context.getImageData(0, 0, thiscanvas.width, thiscanvas.height);
+        document.getElementById("bk-color").addEventListener("input", function(event) {
+            //var hexcolor = document.getElementById("bk-color").value.substring(1);
+            var hexcolor = event.target.value.substring(1);
+            var rgbHex = hexcolor.match(/.{1,2}/g);
+            clearColor = vec4.fromValues(
+                parseInt(rgbHex[0], 16) * 1.0 / 255.0,
+                parseInt(rgbHex[1], 16) * 1.0 / 255.0,
+                parseInt(rgbHex[2], 16) * 1.0 / 255.0,
+                1.0
+            );
+        });
 
-                for( var x = 0, width = imgData.width; x < width; x++ ){
-                    for( var y = 0, height = imgData.height; y < height; y++ ){
-                        var p = (y*width+x)*4;
-                        var brightness = (imgData.data[p] + imgData.data[p+1] + imgData.data[p+2])/(255*3);
-                        maxBrightness = Math.max( maxBrightness, brightness );
-                        totalBrightness += brightness;
-                    }
-                }
-            }
-            averageBrightness = totalBrightness / (imgData.width * imgData.height * 6);
+        document.getElementById("lt-ambient-color").addEventListener("input", function(event) {
+            var hexcolor = event.target.value.substring(1);
+            var rgbHex = hexcolor.match(/.{1,2}/g);
+            lightAmbient = vec4.fromValues(
+                parseInt(rgbHex[0], 16) * 1.0 / 255.0,
+                parseInt(rgbHex[1], 16) * 1.0 / 255.0,
+                parseInt(rgbHex[2], 16) * 1.0 / 255.0,
+                1.0
+            );
+        });
 
-            gl.texParameteri( gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST );
-            gl.texParameteri( gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST );
-            gl.uniform1f(gl.getUniformLocation(programtex,"averageBrightness"), averageBrightness);
-            gl.uniform1f(gl.getUniformLocation(programtex,"maxBrightness"), maxBrightness);
+        document.getElementById("lt-diffuse-color").addEventListener("input", function(event) {
+            var hexcolor = event.target.value.substring(1);
+            var rgbHex = hexcolor.match(/.{1,2}/g);
+            lightDiffuse = vec4.fromValues(
+                parseInt(rgbHex[0], 16) * 1.0 / 255.0,
+                parseInt(rgbHex[1], 16) * 1.0 / 255.0,
+                parseInt(rgbHex[2], 16) * 1.0 / 255.0,
+                1.0
+            );
+        });
+
+        document.getElementById("lt-specular-color").addEventListener("input", function(event) {
+            var hexcolor = event.target.value.substring(1);
+            var rgbHex = hexcolor.match(/.{1,2}/g);
+            lightSpecular = vec4.fromValues(
+                parseInt(rgbHex[0], 16) / 255.0,
+                parseInt(rgbHex[1], 16) / 255.0,
+                parseInt(rgbHex[2], 16) / 255.0,
+                1.0
+            );
+        });
+
+        document.getElementById("slider-x").addEventListener("input", function(event) {
+            var lx = parseFloat(event.target.value);
+            lightPosition[0] = lx;
+            document.getElementById("slider-x-value").innerHTML = lx;
+        });
+
+        document.getElementById("slider-y").addEventListener("input", function(event) {
+            var ly = parseFloat(event.target.value);
+            lightPosition[1] = ly;
+            document.getElementById("slider-y-value").innerHTML = ly;
+        });
+
+        document.getElementById("slider-z").addEventListener("input", function(event) {
+            var lz = parseFloat(event.target.value);
+            lightPosition[2] = lz;
+            document.getElementById("slider-z-value").innerHTML = lz;
+        });
+
+        document.getElementById("slider-radius").addEventListener("input", function(event) {
+            var r = parseFloat(event.target.value);
+            radius = r;
+            document.getElementById("slider-radius-value").innerHTML = r;
+        });
+
+        document.getElementById("slider-theta").addEventListener("input", function(event) {
+            var t = parseFloat(event.target.value);
+            theta = t;
+            document.getElementById("slider-theta-value").innerHTML = t;
+        });
+
+        document.getElementById("slider-phi").addEventListener("input", function(event) {
+            var p = parseFloat(event.target.value);
+            phi = p;
+            document.getElementById("slider-phi-value").innerHTML = p;
+        });
+    }
+
+    this.updateShader = function(newVertSrc, newFragSrc) {
+        vertSrc = newVertSrc;
+        fragSrc = newFragSrc;
+
+        gl.deleteProgram(progID);
+        gl.deleteShader(vertID);
+        gl.deleteShader(fragID);
+
+        setupShaders();
+    }
+
+    function setupShaders() {
+        // create shader
+        vertID = gl.createShader(gl.VERTEX_SHADER);
+        fragID = gl.createShader(gl.FRAGMENT_SHADER);
+
+        // specify shader source
+        gl.shaderSource(vertID, vertSrc);
+        gl.shaderSource(fragID, fragSrc);
+
+        // compile shader
+        gl.compileShader(vertID);
+        gl.compileShader(fragID);
+
+        var error = false;
+        if (!gl.getShaderParameter(vertID, gl.COMPILE_STATUS)) {
+            console.log("error1");
+            error = true;
         }
-        requestCORSIfNotSameOrigin(cubemap_image[i], faceUrl[i]);
-        cubemap_image[i].src = faceUrl[i];
-    }
-}
 
-function buildSkyBox(){
-    var vertices = [
-        -side, -side,  side,
-        -side,  side,  side,
-        side,  side,  side,
-        side, -side,  side,
-        -side, -side, -side,
-        -side,  side, -side,
-        side,  side, -side,
-        side, -side, -side
-    ];
+        if (!gl.getShaderParameter(fragID, gl.COMPILE_STATUS)) {
+            console.log("error2");
+            error = true;
+        }
 
-    var indices = [
-        1, 0, 3,
-        3, 2, 1, //front
-        2, 3, 7,
-        7, 6, 2, //right
-        3, 0, 4,
-        4, 7, 3, //bottom
-        6, 5, 1,
-        1, 2, 6, //top
-        4, 5, 6,
-        6, 7, 4, //back
-        5, 4, 0,
-        0, 1, 5 //left
-    ];
+        if (error)
+            return;
 
-    var texCoord = [
-        vec2.fromValues( 0, 0 ),
-        vec2.fromValues( 0, 1 ),
-        vec2.fromValues( 1, 1 ),
-        vec2.fromValues( 1, 0 )
-    ];
+        // create program and attach shaders
+        progID = gl.createProgram();
+        gl.attachShader(progID, vertID);
+        gl.attachShader(progID, fragID);
 
-    var texCoordID = [
-        0, 1, 2, 0, 2, 3
-    ];
+        // link the program
+        gl.linkProgram(progID);
+        if (!gl.getProgramParameter(progID, gl.LINK_STATUS)) {
+            alert(gl.getProgramInfoLog(progID));
+            return;
+        }
 
-    var fnormals = [
-        vec3.fromValues( 0, 0, 1 ),
-        vec3.fromValues( 1, 0, 0 ),
-        vec3.fromValues( 0, -1, 0 ),
-        vec3.fromValues( 0, 1, 0 ),
-        vec3.fromValues( 0, 0, -1 ),
-        vec3.fromValues( -1, 0, 0 )
-    ];
+        gl.useProgram(progID);
 
-    for( var i = 0; i < vertices.length; i++ )
-        skyboxPoints.push( vertices[i] );
-    for( var i = 0; i < indices.length; i++ ){
-        //skyboxPoints.push( vertices[indices[i]][0], vertices[indices[i]][1], vertices[indices[i]][2] );
-        var texid = texCoordID[ i%6 ];
-        var fnid = parseInt(i/6);
-        //skyboxtexCoords.push( texCoord[ texid ][0], texCoord[ texid ][1] );
-        skyboxNormals.push( fnormals[fnid][0], fnormals[fnid][1], fnormals[fnid][2] );
-        skyboxIndices.push(indices[i]);
+        vertexLoc = gl.getAttribLocation(progID, "vPosition");
+        normalLoc = gl.getAttribLocation(progID, "vNormal");
+
+        // retrieve the location of the uniform variables of the shader
+        ambientProdLoc = gl.getUniformLocation(progID, "ambientProduct");
+        diffuseProdLoc = gl.getUniformLocation(progID, "diffuseProduct");
+        specularProdLoc = gl.getUniformLocation(progID, "specularProduct");
+
+        modelViewMatrixLoc = gl.getUniformLocation(progID, "modelViewMatrix");
+        projectionMatrixLoc = gl.getUniformLocation(progID, "projectionMatrix");
+        normalMatrixLoc = gl.getUniformLocation(progID, "normalMatrix");
+
+        lightPositionLoc = gl.getUniformLocation(progID, "lightPosition");
+        shininessLoc = gl.getUniformLocation(progID, "shininess");
+
+        materialKaLoc = gl.getUniformLocation(progID, "materialKa");
+        materialKdLoc = gl.getUniformLocation(progID, "materialKd");
+        materialKsLoc = gl.getUniformLocation(progID, "materialKs");
     }
 
-    skyboxvBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, skyboxvBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(skyboxPoints), gl.STATIC_DRAW );
+    function initCoefficients() {
+        // material
+        var mka = parseFloat(document.getElementById("slider-ka").value);
+        materialKa = mka;
 
-    gl.vertexAttribPointer( skyboxpointsLoc, 3, gl.FLOAT, false, 0, 0 );
-    //gl.enableVertexAttribArray( skyboxpointsLoc);
+        var mkd = parseFloat(document.getElementById("slider-kd").value);
+        materialKd = mkd;
 
-    skyboxnBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, skyboxnBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, new Float32Array(skyboxNormals), gl.STATIC_DRAW );
+        var mks = parseFloat(document.getElementById("slider-ks").value);
+        materialKs = mks;
 
-    gl.vertexAttribPointer( skyboxnormalsLoc, 3, gl.FLOAT, false, 0, 0);
-    //gl.enableVertexAttribArray( skyboxnormalsLoc );
+        materialShininess = parseInt(document.getElementById("slider-sh").value);
 
-    skyboxiBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ELEMENT_ARRAY_BUFFER, skyboxiBuffer );
-    gl.bufferData( gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(skyboxIndices), gl.STATIC_DRAW );
-
-    if(cubemapTexture){
-        gl.useProgram(programskybox);
-        gl.bindTexture( gl.TEXTURE_CUBE_MAP, cubemapTexture );
-        gl.uniform1i( gl.getUniformLocation( programskybox, "texCubemap" ), 0 );
-    }
-    //gl.uniform1i( gl.getUniformLocation( programskybox, "texCubemap" ), 0 );
-
-}
-
-function initInterface(){
-    objFileInput = document.getElementById("modelInput");
-    objFileInput.addEventListener("change", function(event){
-        var file = objFileInput.files[0];
-        var reader = new FileReader();
-
-        reader.onload = function(event){
-            meshdata = reader.result;
-            initObj();
-        };
-        reader.readAsText(file);
-    });
-
-    textureFileInput = document.getElementById("textureInput");
-    textureFileInput.addEventListener("change", function(event){
-        var file = textureFileInput.files[0];
-        var prehead = "http://localhost:63342/";
-        var imgurl = prehead.concat(file.name);
-        configureTexture( imgurl );
-    });
-
-    bumpFileInput = document.getElementById("bumpInput");
-    bumpFileInput.addEventListener("change", function(event){
-        var file = bumpFileInput.files[0];
-        var prehead = "http://localhost:63342/";
-        var imgurl = prehead.concat(file.name);
-        configureBumpTexture( imgurl );
-    });
-
-    document.getElementById("objcolor").addEventListener("input", function(event){
-        var hexColor = this.value.substring(1);
-        var rgbToHex = hexColor.match(/.{1,2}/g);
-        baseColor = vec4.fromValues(
-            parseInt(rgbToHex[0], 16) / 255.0,
-            parseInt(rgbToHex[1], 16) / 255.0,
-            parseInt(rgbToHex[2], 16) / 255.0,
+        // set material color
+        var ambhexcolor = document.getElementById("ka-color").value.substring(1).match(/.{1,2}/g);
+        materialAmbient = vec4.fromValues(
+            parseInt(ambhexcolor[0], 16) * 1.0 / 255.0,
+            parseInt(ambhexcolor[1], 16) * 1.0 / 255.0,
+            parseInt(ambhexcolor[2], 16) * 1.0 / 255.0,
             1.0
         );
-    });
 
-    document.getElementById("textureAlpha").addEventListener("input", function(event){
-        textureAlpha = parseFloat(event.target.value);
-    });
+        var difhexcolor = document.getElementById("kd-color").value.substring(1).match(/.{1,2}/g);
+        materialDiffuse = vec4.fromValues(
+            parseInt(difhexcolor[0], 16) * 1.0 / 255.0,
+            parseInt(difhexcolor[1], 16) * 1.0 / 255.0,
+            parseInt(difhexcolor[2], 16) * 1.0 / 255.0,
+            1.0
+        );
 
-    document.getElementById("bumpdepth").addEventListener("input", function(event){
-        bumpDepth = parseFloat(event.target.value);
-    });
+        var spehexcolor = document.getElementById("ks-color").value.substring(1).match(/.{1,2}/g);
+        materialSpecular = vec4.fromValues(
+            parseInt(spehexcolor[0], 16) * 1.0 / 255.0,
+            parseInt(spehexcolor[1], 16) * 1.0 / 255.0,
+            parseInt(spehexcolor[2], 16) * 1.0 / 255.0,
+            1.0
+        );
 
-    document.getElementById("shininess").addEventListener("input", function(event){
-        matShininess = parseFloat(event.target.value);
-    });
+        var ltx = parseFloat(document.getElementById("slider-x").value);
+        var lty = parseFloat(document.getElementById("slider-y").value);
+        var ltz = parseFloat(document.getElementById("slider-z").value);
+        lightPosition = vec4.fromValues(ltx, lty, ltz, 1.0);
 
-    document.getElementById("shadowdepth").addEventListener("input", function(event){
-        shadowDepth = parseFloat(event.target.value);
-    });
+        // set light color
+        var lambhexcolor = document.getElementById("lt-ambient-color").value.substring(1).match(/.{1,2}/g);
+        lightAmbient = vec4.fromValues(
+            parseInt(lambhexcolor[0], 16) * 1.0 / 255.0,
+            parseInt(lambhexcolor[1], 16) * 1.0 / 255.0,
+            parseInt(lambhexcolor[2], 16) * 1.0 / 255.0,
+            1.0
+        );
 
-    canvas.onmousedown = handleMouseDown;
-    document.onmouseup = handleMouseUp;
-    document.onmousemove = handleMouseMove;
-}
+        var ldifhexcolor = document.getElementById("lt-diffuse-color").value.substring(1).match(/.{1,2}/g);
+        lightDiffuse = vec4.fromValues(
+            parseInt(ldifhexcolor[0], 16) * 1.0 / 255.0,
+            parseInt(ldifhexcolor[1], 16) * 1.0 / 255.0,
+            parseInt(ldifhexcolor[2], 16) * 1.0 / 255.0,
+            1.0
+        );
 
-function isPowerOf2( value ){
-    return (value & (value - 1)) == 0;
-}
+        var lspehexcolor = document.getElementById("lt-specular-color").value.substring(1).match(/.{1,2}/g);
+        lightSpecular = vec4.fromValues(
+            parseInt(lspehexcolor[0], 16) * 1.0 / 255.0,
+            parseInt(lspehexcolor[1], 16) * 1.0 / 255.0,
+            parseInt(lspehexcolor[2], 16) * 1.0 / 255.0,
+            1.0
+        );
 
-function initObj(){
-    // read obj file, initialize points, vertex coordinates, colors
-    mesh = new OBJ.Mesh( meshdata );
-    //OBJ.initMeshBuffers( gl, mesh );
-
-    // normalize all vertex position into [-1,1], and center at [0,0,0]
-    dx = -1.0 * (parseFloat(mesh.xmax) + parseFloat(mesh.xmin))/2.0;
-    dy = -1.0 * (parseFloat(mesh.ymax) + parseFloat(mesh.ymin))/2.0;
-    dz = -1.0 * (parseFloat(mesh.zmax) + parseFloat(mesh.zmin))/2.0;
-
-    var maxScale;
-    var scalex = Math.abs(parseFloat(mesh.xmax)-parseFloat(mesh.xmin));
-    var scaley = Math.abs(parseFloat(mesh.ymax)-parseFloat(mesh.ymin));
-    var scalez = Math.abs(parseFloat(mesh.zmax)-parseFloat(mesh.zmin));
-
-    maxScale = Math.max(scalex, scaley, scalez);
-
-    sx =  2.0/maxScale;
-    sy =  2.0/maxScale;
-    sz =  2.0/maxScale;
-    meshinited = true;
-    render();
-}
-
-function buildModelViewProj(){
-    var rthe = theta * Math.PI / 180.0;
-    var rphi = phi * Math.PI / 180.0;
-
-    vec3.set(eye, radius * Math.sin(rthe) * Math.cos(rphi), radius * Math.sin(rthe) * Math.sin(rphi), radius * Math.cos(rthe));
-
-    mat4.lookAt( modelViewMatrix, eye, at, up );
-
-    skyboxModelViewMatrix = mat4.clone( modelViewMatrix );
-    for( var i = 12; i <= 14; i++ )
-        skyboxModelViewMatrix[i]=0;
-    //mat4.rotateY(skyboxModelViewMatrix, skyboxModelViewMatrix, dyt * Math.PI / 180.0);
-    mat4.translate( modelViewMatrix, modelViewMatrix, vec3.fromValues( dx, dy, dz ) );
-    mat4.scale(modelViewMatrix, modelViewMatrix, vec3.fromValues(sx, sy, sz));
-    //mat4.rotateZ(modelViewMatrix, modelViewMatrix, dzt * Math.PI / 180.0);
-    //mat4.rotateY(modelViewMatrix, modelViewMatrix, dyt * Math.PI / 180.0);
-
-    //mat4.rotateX(modelViewMatrix, modelViewMatrix, dxt * Math.PI / 180.0);
-
-    //mat4.ortho( projectionMatrix, left, right, ybottom, ytop, near, far );
-    aspect = 1;
-    mat4.perspective(projectionMatrix, fovy, aspect, pnear, pfar);
-
-    mat3.fromMat4(normalMatrix, modelViewMatrix);
-
-    mat3.normalFromMat4(invModelViewMatrix, modelViewMatrix);
-    mat3.transpose(invModelViewMatrix, invModelViewMatrix);
-
-    //console.log(prod);
-
-    //invModelViewMatrixLoc = gl.getUniformLocation(programtex, "invModelViewMatrix");
-    //gl.uniformMatrix3fv(invModelViewMatrixLoc, false, new Float32Array(invModelViewMatrix));
-}
-
-//var interval = setInterval(timerFunc, 30);
-/*
-function timerFunc() {
-    dyt += 0.5;
-    dxt += 0.5;
-    if( dyt > 360 )
-        dyt -= 360;
-    if( dxt > 360 )
-        dxt -= 360;
-
-    //dy += diry * 0.1;
-
-    //if( dy > 3.0 || dy < -3.0 )
-     //   diry *= -1;
-
-    render();
-}*/
-
-function buildLight(){
-}
-
-function drawSkybox(){
-    //gl.cullFace(gl.FRONT);
-    gl.useProgram( programskybox );
-    gl.uniformMatrix4fv(gl.getUniformLocation(programskybox, "projectionMatrix"), false, new Float32Array(projectionMatrix));
-    gl.uniformMatrix4fv(gl.getUniformLocation(programskybox, "modelViewMatrix"), false, new Float32Array(skyboxModelViewMatrix));
-
-    gl.activeTexture( gl.TEXTURE0 );
-    gl.bindTexture( gl.TEXTURE_CUBE_MAP, cubemapTexture );
-
-    gl.bindBuffer( gl.ARRAY_BUFFER, skyboxnBuffer );
-    gl.enableVertexAttribArray( skyboxnormalsLoc );
-    gl.bindBuffer( gl.ARRAY_BUFFER, skyboxvBuffer );
-    gl.vertexAttribPointer( skyboxpointsLoc, 3, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( skyboxpointsLoc);
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, skyboxiBuffer);
-    gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0 );
-    gl.disableVertexAttribArray(skyboxpointsLoc);
-    gl.disableVertexAttribArray(skyboxnormalsLoc);
-    //console.log("Skybox");
-}
-
-function drawObject(){
-    gl.useProgram( programtex );
-
-    gl.uniformMatrix4fv(gl.getUniformLocation(programtex, "modelViewMatrix"), false, new Float32Array(modelViewMatrix));
-
-    gl.uniformMatrix4fv(gl.getUniformLocation(programtex, "projectionMatrix"), false, new Float32Array(projectionMatrix));
-
-    gl.uniformMatrix3fv(gl.getUniformLocation(programtex, "normalMatrix"), false, new Float32Array(normalMatrix));
-
-    gl.uniform3fv( gl.getUniformLocation( programtex, "lightPos"), new Float32Array( eye ) );
-
-    gl.uniform4fv(gl.getUniformLocation( programtex, "fColor" ), new Float32Array( baseColor ) );
-    gl.uniform1f(gl.getUniformLocation(programtex,"textureAlpha"), textureAlpha);
-    gl.uniform1f(gl.getUniformLocation(programtex,"shininess"), matShininess);
-    gl.uniform1f(gl.getUniformLocation(programtex, "bumpDepth"), bumpDepth);
-    if( meshinited === true ){
-        gl.activeTexture( gl.TEXTURE1 );
-        gl.bindTexture( gl.TEXTURE_CUBE_MAP, cubemapTexture );
-
-        gl.activeTexture( gl.TEXTURE2 );
-        gl.bindTexture( gl.TEXTURE_2D, texture );
-
-        gl.activeTexture( gl.TEXTURE3 );
-        gl.bindTexture( gl.TEXTURE_2D, bumpTexture );
-
-        if( mesh.inited === false ){
-            gl.uniform1i( gl.getUniformLocation( programtex, "texCubemap" ), 1 );
-            gl.uniform1i( gl.getUniformLocation( programtex, "texture" ), 2 );
-            gl.uniform1i( gl.getUniformLocation( programtex, "texbump" ), 3 );
-
-            OBJ.initMeshBuffers(gl, mesh);
-            gl.bindBuffer(gl.ARRAY_BUFFER, mesh.normalBuffer );
-            gl.vertexAttribPointer(normalLoc, mesh.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-            gl.enableVertexAttribArray(normalLoc);
-            gl.bindBuffer( gl.ARRAY_BUFFER, mesh.vertexBuffer );
-            gl.vertexAttribPointer( positionLoc, mesh.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0 );
-            gl.enableVertexAttribArray(positionLoc);
-        }
-        // gl.bindBuffer( gl.ARRAY_BUFFER, mesh.normalBuffe);
-        // gl.vertexAttribPointer(normalLoc, mesh.normalBuffer.itemSize, gl.FLOAT, false, 0, 0 );
-        // gl.enableVertexAttribArray(normalLoc);
-        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.normalBuffer );
-        gl.enableVertexAttribArray(normalLoc);
-        gl.bindBuffer( gl.ARRAY_BUFFER, mesh.vertexBuffer );
-        gl.enableVertexAttribArray(positionLoc);
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer);
-        gl.drawElements(gl.TRIANGLES, mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
-        gl.disableVertexAttribArray(positionLoc);
-        gl.disableVertexAttribArray(normalLoc);
+        var cchexcolor = document.getElementById("bk-color").value.substring(1).match(/.{1,2}/g);
+        clearColor = vec4.fromValues(
+            parseInt(cchexcolor[0], 16) * 1.0 / 255.0,
+            parseInt(cchexcolor[1], 16) * 1.0 / 255.0,
+            parseInt(cchexcolor[2], 16) * 1.0 / 255.0,
+            1.0
+        );
+        radius = parseFloat(document.getElementById("slider-radius").value);
+        theta = parseFloat(document.getElementById("slider-theta").value);
+        phi = parseFloat(document.getElementById("slider-phi").value);
     }
-    //console.log("object");
-}
 
-function render(){
-    gl.viewport( 0, 0, canvas.width, canvas.height );
-    //aspect = canvas.width / canvas.height;
-    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    this.initModel = function() {
+        if (this.modelFile == null)
+            return;
 
-    //gl.cullFace(gl.BACK);
+        var reader = new FileReader();
+        reader.onload = function(event) {
+            meshdata = reader.result;
+            initObj();
+        }
+        reader.readAsText(this.modelFile);
+    }
 
-    buildModelViewProj();
-    drawSkybox();
-    drawObject();
+    function initObj() {
+        mesh = new OBJ.Mesh(meshdata);
+        // mesh.normalBuffer, mesh.textureBuffer, mesh.vertexBuffer, mesh.indexBuffer
+        OBJ.initMeshBuffers(gl, mesh);
 
-    dyt += 0.5;
-    if( dyt > 360 )
-        dyt -= 360;
-    requestAnimFrame(render);
+        // init object vertices
+        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.vertexBuffer);
+
+        gl.vertexAttribPointer(vertexLoc, mesh.vertexBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(vertexLoc);
+
+        gl.bindBuffer(gl.ARRAY_BUFFER, mesh.normalBuffer);
+
+        gl.vertexAttribPointer(normalLoc, mesh.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+        gl.enableVertexAttribArray(normalLoc);
+        useObjNormal = true;
+
+        dx = -1.0 * (parseFloat(mesh.xmax) + parseFloat(mesh.xmin)) / 2.0;
+        dy = -1.0 * (parseFloat(mesh.ymax) + parseFloat(mesh.ymin)) / 2.0;
+        dz = -1.0 * (parseFloat(mesh.zmax) + parseFloat(mesh.zmin)) / 2.0;
+
+        var maxScale;
+        var scalex = Math.abs(parseFloat(mesh.xmax) - parseFloat(mesh.xmin));
+        var scaley = Math.abs(parseFloat(mesh.ymax) - parseFloat(mesh.ymin));
+        var scalez = Math.abs(parseFloat(mesh.zmax) - parseFloat(mesh.zmin));
+
+        maxScale = Math.max(scalex, scaley, scalez);
+
+        sx = 2.0 / maxScale;
+        sy = 2.0 / maxScale;
+        sz = 2.0 / maxScale;
+
+        dx = 0;
+        dy = 0;
+        dz = 0;
+    }
+
+    this.display = function() {
+        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+        gl.clearColor(clearColor[0], clearColor[1], clearColor[2], clearColor[3]);
+        gl.viewport(0, 0, canvas.width, canvas.height);
+        gl.enable(gl.DEPTH_TEST);
+        gl.enable(gl.CULL_FACE);
+
+        var ambientProduct = vec4.create();
+        vec4.multiply(ambientProduct, lightAmbient, materialAmbient);
+
+        var diffuseProduct = vec4.create();
+        vec4.multiply(diffuseProduct, lightDiffuse, materialDiffuse);
+
+        var specularProduct = vec4.create();
+        vec4.multiply(specularProduct, lightSpecular, materialSpecular);
+
+        vec3.set(eye, radius * Math.sin(theta * Math.PI / 180.0) * Math.cos(phi * Math.PI / 180.0),
+            radius * Math.sin(theta * Math.PI / 180.0) * Math.sin(phi * Math.PI / 180.0),
+            radius * Math.cos(theta * Math.PI / 180.0));
+
+        mat4.lookAt(modelViewMatrix, eye, at, up);
+        //mat4.ortho(projectionMatrix, left, right, ybottom, ytop, near, far);
+
+        mat4.scale(modelViewMatrix, modelViewMatrix, vec3.fromValues(sx, sy, sz));
+        mat4.rotateY(modelViewMatrix, modelViewMatrix, dty * Math.PI / 180.0);
+        dty = (dty + stept) % 360;
+
+        var aspect = 1;
+        mat4.perspective(projectionMatrix, fovy, aspect, near, far);
+
+        mat3.fromMat4(normalMatrix, modelViewMatrix);
+
+        gl.uniform4fv(ambientProdLoc, new Float32Array(ambientProduct));
+        gl.uniform4fv(diffuseProdLoc, new Float32Array(diffuseProduct));
+        gl.uniform4fv(specularProdLoc, new Float32Array(specularProduct));
+        gl.uniform4fv(lightPositionLoc, new Float32Array(lightPosition));
+        gl.uniform1f(shininessLoc, materialShininess);
+        gl.uniform1f(materialKaLoc, materialKa);
+        gl.uniform1f(materialKdLoc, materialKd);
+        gl.uniform1f(materialKsLoc, materialKs);
+
+        gl.uniformMatrix4fv(modelViewMatrixLoc, false, new Float32Array(modelViewMatrix));
+        gl.uniformMatrix4fv(projectionMatrixLoc, false, new Float32Array(projectionMatrix));
+        gl.uniformMatrix3fv(normalMatrixLoc, false, new Float32Array(normalMatrix));
+
+        if (mesh) {
+            gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, mesh.indexBuffer);
+            gl.drawElements(gl.TRIANGLES, mesh.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+        }
+    }
 }

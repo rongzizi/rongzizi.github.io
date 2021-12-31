@@ -1,10 +1,177 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Phong Shading</title>
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <script type="text/javascript" src="../JS/common/webgl-utils.js"></script>
+    <script type="text/javascript" src="../JS/common/initShaders.js"></script>
+    <script type="text/javascript" src="../JS/common/gl-matrix.js"></script>
+
+    <script type="text/javascript" src="../JS/Lab6-b.js"></script>
+
+    <script type="text/javascript">
+
+        var renderer = 0;
+
+        function run(){
+            var vertSrc = document.getElementById( "code_vert" ).value;
+            var fragSrc = document.getElementById( "code_frag" ).value;
+
+            renderer = new Renderer( "gl-canvas", vertSrc, fragSrc );
+            renderer.init();
+            renderer.display();
+        }
+
+        function updateRenderer(){
+            var vertSrc = document.getElementById( "code_vert" ).value;
+            var fragSrc = document.getElementById( "code_frag" ).value;
+
+            renderer.updateShader( vertSrc, fragSrc );
+            renderer.display();
+        }
+
+        var interval = setInterval( timerFunc, 30 );
+
+        function timerFunc(){
+            renderer.display();
+        }
+
+        function exampleChanged(){
+            var d = parseInt( document.getElementById( "select_shade_id" ).value );
+            renderer.modeVal = d;
+            switch( d ){
+                default:
+                case 1:
+                    document.getElementById( "code_vert" ).value = document.getElementById( "vshader-6" ).value;
+                    document.getElementById( "code_frag" ).value = document.getElementById( "fshader-6" ).value;
+                    break;
+            }
+            updateRenderer();
+        }
+
+    </script>
 </head>
-<body>
+<body onload="run()">
+<h1>Phong着色(平面法线+面片着色)</h1>
+
+<table style="border:1px solid black">
+    <caption align="bottom">按键设置</caption>
+    <tr>
+        <td>a</td>
+        <td>d</td>
+        <td>w</td>
+        <td>s</td>
+        <td>z</td>
+        <td>x</td>
+    </tr>
+    <tr>
+        <td>增加theta</td>
+        <td>减少theta</td>
+        <td>增加phi</td>
+        <td>减少phi</td>
+        <td>增大半径radius</td>
+        <td>减少半径radius</td>
+    </tr>
+    <tr>
+        <td>v</td>
+        <td>b</td>
+    </tr>
+    <tr>
+        <td>增加分块</td>
+        <td>减小分块</td>
+    </tr>
+</table>
+
+<table>
+    <tr style="vertical-align:top;">
+        <td>
+            <canvas id="gl-canvas" width="640" height="480">您的浏览器不支持HTML5 Canvas元素</canvas><br>
+            <select onchange="exampleChanged()" id="select_shade_id">
+                <option value="1">Phong Shading</option>
+            </select>
+        </td>
+    </tr>
+    <table border="0" class="maintable" cellpadding="5px" cellspacing="5px">
+        <tr style="vertical-align: top;">
+            <td>Vertex shader: <br><textarea cols="50" rows="20" class="code_input_vert" id="code_vert" wrap="logical">
+attribute vec4 vPosition;
+attribute vec4 vNormal;
+
+varying vec4 fColor;
+
+uniform vec4 ambientProduct, diffuseProduct, specularProduct;
+uniform mat4 modelViewMatrix;
+uniform mat4 projectionMatrix;
+uniform vec4 lightPosition;
+uniform float shininess;
+uniform mat3 normalMatrix;
+
+void main()
+{
+	// pos is vertex position in eye coordinates
+	vec3 pos = (modelViewMatrix * vPosition).xyz;
+
+	// vector from vertex position to light source
+	vec3 L;
+
+	// check for directional light
+	if(lightPosition.w == 0.0)
+	{
+		L = normalize(lightPosition.xyz);
+	}
+	else
+	{
+		L = normalize( lightPosition.xyz - pos );
+	}
+
+	// Because the eye point the is at the orgin
+	// the vector from the vertex position to the eye is
+	vec3 E = -normalize( pos );
+
+	// halfway vector
+	vec3 H = normalize( L + E );
+
+	// Transform vertex normal into eye coordinates
+	vec3 N = normalize( normalMatrix*vNormal.xyz);
+
+	// Compute terms in the illumination equation
+	vec4 ambient = ambientProduct;
+
+	float Kd = max( dot(L, N), 0.0 );
+	vec4  diffuse = Kd*diffuseProduct;
+
+	float Ks = pow( max(dot(N, H), 0.0), shininess );
+	vec4  specular = Ks * specularProduct;
+
+	if( dot(L, N) < 0.0 ){
+		specular = vec4(0.0, 0.0, 0.0, 1.0);
+	}
+
+	gl_Position = projectionMatrix * modelViewMatrix * vPosition;
+
+	fColor = ambient + diffuse +specular;
+
+	fColor.a = 1.0;
+}
+		</textarea>
+                <p id="code_vert_error" style="width: 200px;"></p>
+            </td>
+
+            <td>Fragment shader: <br>
+                <textarea cols="50" rows="20" class="code_input" id="code_frag" wrap="logical">
+					precision mediump float;
+					varying vec4 fColor;
+
+					void main()
+					{
+						gl_FragColor = fColor;
+					}
+				</textarea>
+                <p id="code_frag_error" style="width: 200px;"></p>
+            </td>
+        </tr>
+    </table>
+</table>
 
 </body>
 </html>

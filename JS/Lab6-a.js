@@ -7,7 +7,7 @@ const {
 var canvas;
 var gl;
 
-var numOfSubdivides = 0;
+var numOfSubdivides = 4;
 
 var points = [];
 var index = 0;
