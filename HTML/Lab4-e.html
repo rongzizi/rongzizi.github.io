@@ -1,10 +1,105 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+    <meta http-equiv="Content-type" content="text/html;charset=utf-8">
+    <title>E</title>
+    <script id="rtvshader" type="x-shader/x-vertex">
+	attribute vec4 a_Position;
+	attribute vec4 vColor;
+	varying vec4 fColor;
+
+	//three mat
+	uniform vec3 theta;
+	uniform vec3 scale;
+	uniform vec3 offset;
+
+	void main()
+	{
+		vec3 angles = radians( theta );
+		vec3 cost = cos( theta );
+		vec3 sint = sin( theta );
+
+		mat4 rx = mat4(  1.0,  0.0,  0.0, 0.0,
+						 0.0,  cost.x,  sint.x, 0.0,
+						 0.0,  -sint.x,  cost.x, 0.0,
+						 0.0,  0.0,  0.0, 1.0
+						 );
+
+		mat4 ry = mat4(  cost.y,  0.0, -sint.y,  0.0,
+						 0.0,  1.0,  0.0,  0.0,
+						 sint.y,  0.0,  cost.y,  0.0,
+						 0.0,  0.0,  0.0,  1.0
+						 );
+
+		mat4 rz = mat4(  cost.z,  sint.z,  0.0,  0.0,
+						 -sint.z,  cost.z,  0.0,  0.0,
+						 0.0,  0.0,  1.0,  0.0,
+						 0.0,  0.0,  0.0,  1.0
+						 );
+
+		mat4 tx = mat4(
+							1, 0, 0, 0,
+							0, 1, 0, 0,
+							0, 0, 1, 0,
+							offset[0], offset[1], offset[2], 1
+						);
+
+		mat4 sx = mat4(
+							scale[0], 0, 0, 0,
+							0, scale[1], 0, 0,
+							0, 0, scale[2], 0,
+							0, 0, 0, 1
+						);
+
+		fColor = vColor;
+		gl_Position = tx*rz*ry*rx*sx*a_Position;	//sclae->roat->translation
+
+	}
+	</script>
+
+    <script id="rtfshader" type="x-shader/x-fragment">
+	precision mediump float;
+	varying vec4 fColor;
+
+	void main()
+	{
+		gl_FragColor = fColor;
+	}
+	</script>
+    <script type="text/javascript" src="../JS/common/webgl-utils.js"></script>
+    <script type="text/javascript" src="../JS/common/initShaders.js"></script>
+    <script type="text/javascript" src="../JS/common/gl-matrix-min.js"></script>
+
+    <script type="text/javascript" src="../JS/Lab4-e.js"></script>
+    <style type="text/css">
+        body{
+            text-align:center
+        }
+    </style>
 </head>
+
 <body>
-<h1>暂时还没完成，请稍等</h1>
+
+<canvas id="rtcb-canvas" width="1024" height="512">
+    你的浏览器不支持HTML5 canvas元素
+</canvas>
+<br>
+<button id="xbutton">Rotate X</button>
+<button id="ybutton">Rotate Y</button>
+<button id="zbutton">Rotate Z</button>
+颜色<input type="color" id="_color" value="#90EE90">
+<button id = "cube">立方体</button>
+<button id = "triangle">正三角形</button>
+缩放<input id="_scale" type="range" name="Scale x" min="0.0" max="2.0" value="1.0" step="0.1"></input>
+<button id="rectangle">长方形</button>
+缩放<input id="scale_r" type="range" name="Scale x" min="0.2" max="1.5" value="1.0" step="0.1"></input>
+<br>
+速度<input type="range" id="speed" min="0.0" max="1.0" value="0.5" step="0.1">
+<button id="circle">圆</button>
+速度<input type="range" id="speed_circle" min="0.0" max="1.0" value="0.5" step="0.1"> <input type="range" id="edge" min="1" max="360" value="100" step="1">
+<button id="clear">刷新</button>
+
 </body>
+
 </html>

@@ -4,6 +4,11 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
     <title>Lab3-a</title>
+    <style type="text/css">
+        body{
+            text-align:center
+        }
+    </style>
     <script id="rot-v-shader" type="x-shader/x-vertex">
 	attribute vec4 vPosition;
 	uniform float theta;
@@ -41,7 +46,7 @@
 
 <body onload="initRotSquare()">
 <canvas id="rot-canvas" width="512" height="512">你的浏览器不支持HTML5 canvas元素</canvas>
-<fieldset style="width: 500px">
+<fieldset>
     <legend>转动控制</legend>
     <button id="direction" onclick="changeDir()">change direction</button>
     <select id="controls" size="3">
