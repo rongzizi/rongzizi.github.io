@@ -94,19 +94,6 @@
       <recent name="D:\BaiduNetdiskDownload\github\rongzizi.github.io\JS\demo" />
     </key>
   </component>
-  <component name="RunManager">
-    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
-      <option name="arquillianRunConfiguration">
-        <value>
-          <option name="containerStateName" value="" />
-        </value>
-      </option>
-      <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
     <configuration />
@@ -158,6 +145,7 @@
       <workItem from="1640677395605" duration="1821000" />
       <workItem from="1640689056412" duration="3316000" />
       <workItem from="1640962235691" duration="7102000" />
+      <workItem from="1641042597847" duration="342000" />
     </task>
     <servers />
   </component>

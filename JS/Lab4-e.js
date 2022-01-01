@@ -1,7 +1,3 @@
-//kong 2021_11_03
-//rev 2021_11_05
-//Learning and Sharing Thechnology
-
 "use strict";
 const {
     vec2,
@@ -15,40 +11,36 @@ var cBuffer,vBuffer;
 
 //
 var numVertices = 0;
-//var index_c = 0;
-//cube
-var cubeStart = new Array();
-var offsetCube = new Array();
-var scaleCube = new Array();
-var thetaCube = new Array();
+
+var cubeStart = [];
+var offsetCube = [];
+var scaleCube = [];
+var thetaCube = [];
 //triangle
-var numsTriangle = new Array();
-var offsetTriangle = new Array();
-var scaleTriangle = new Array();
-var thetaTriangle = new Array();
-var flagTriangle = new Array();
-//scaleTriangle.push(vec3.fromValues(0.2, 0.2, 0.2));
+var numsTriangle = [];
+var offsetTriangle = [];
+var scaleTriangle = [];
+var thetaTriangle = [];
+var flagTriangle = [];
 var scale_t = 0.55;
-//var triangle_p = [];
-//var triangle_c = [];
 
 //rectangle
-var numsRectangle = new Array();
-var offsetRectangle = new Array();
-var scaleRectangle = new Array();
-var thetaRectangle = new Array();
+var numsRectangle = [];
+var offsetRectangle = [];
+var scaleRectangle = [];
+var thetaRectangle = [];
 var scale_rect = 0.2;
 var speed = 0.05;
 
 //circle
-var numsCircle = new Array();
-var offsetCircle = new Array();
-var scaleCircle = new Array();
-var thetaCircle = new Array();
-var cntCircle = new Array();
-var speedOffset = new Array();
-var flagX = new Array();
-var flagY = new Array();
+var numsCircle = [];
+var offsetCircle = [];
+var scaleCircle = [];
+var thetaCircle = [];
+var cntCircle = [];
+var speedOffset = [];
+var flagX = [];
+var flagY = [];
 var speed_circle = 0.01;
 var edge = 180;
 
@@ -441,34 +433,34 @@ function render() {
 function clear() {
     numVertices = 0;
 
-    cubeStart = new Array();
-    offsetCube = new Array();
-    scaleCube = new Array();
-    thetaCube = new Array();
+    cubeStart = [];
+    offsetCube = [];
+    scaleCube = [];
+    thetaCube = [];
 
-    numsTriangle = new Array();
-    offsetTriangle = new Array();
-    scaleTriangle = new Array();
-    thetaTriangle = new Array();
-    flagTriangle = new Array();
+    numsTriangle = [];
+    offsetTriangle = [];
+    scaleTriangle = [];
+    thetaTriangle = [];
+    flagTriangle = [];
     scale_t = 0.55;
 
-    numsRectangle = new Array();
-    offsetRectangle = new Array();
-    scaleRectangle = new Array();
-    thetaRectangle = new Array();
+    numsRectangle = [];
+    offsetRectangle = [];
+    scaleRectangle = [];
+    thetaRectangle = [];
     scale_rect = 0.2;
     speed = 0.05;
 
     //circle
-    numsCircle = new Array();
-    offsetCircle = new Array();
-    scaleCircle = new Array();
-    thetaCircle = new Array();
-    cntCircle = new Array();
-    speedOffset = new Array();
-    flagX = new Array();
-    flagY = new Array();
+    numsCircle = [];
+    offsetCircle = [];
+    scaleCircle = [];
+    thetaCircle = [];
+    cntCircle = [];
+    speedOffset = [];
+    flagX = [];
+    flagY = [];
     speed_circle = 0.01;
     edge = 180;
 
@@ -492,7 +484,5 @@ function clear() {
 
     //offset position
     pos = [0,0,0];
-
-
     colors = vec4.fromValues(0.0, 0.5, 1.0, 1.0);
 }
